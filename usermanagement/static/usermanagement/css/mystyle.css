@@ -1,0 +1,16 @@
+.welcome {
+    text-align: center;
+    position: relative;
+    top: 100px;
+}
+.custom-text {
+    font-size: 20px;
+    color: rgb(175, 200, 221);
+}
+
+.custom-login {
+    text-align: center;
+    position: relative;
+    top: 300px;
+}
+

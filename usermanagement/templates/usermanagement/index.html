@@ -1,0 +1,83 @@
+﻿{% load static %}
+
+<!DOCTYPE html>
+<html>
+
+<!-- Mirrored from thememakker.com/templates/swift/hospital/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 20 Nov 2021 08:11:15 GMT -->
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<title>{% block title %} Home{%endblock %} </title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="{% static 'usermanagement/plugins/bootstrap/css/bootstrap.min.css' %}"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" type="text/css">
+<link rel="stylesheet" href="{% static 'usermanagement/plugins/morrisjs/morris.css' %}"/>
+<!-- Custom Css -->
+<link rel="stylesheet" href="{% static 'usermanagement/css/main.css' %}"/>
+<link rel="stylesheet" href="{% static 'usermanagement/css/mystyle.css' %}"/>
+</head>
+
+<body class="theme-cyan">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="preloader">
+            <div class="spinner-layer pl-cyan">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <p>Please wait...</p>
+    </div>
+</div>
+
+{% if messages %}
+    <div>
+        <ul>
+        {% for message in messages %}
+        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                <strong>{{message}}</strong>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+        </div>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+<div class="container">
+    <div class="welcome">
+        <h1> Welcome to Polyclinic Fultang </h1>
+    </div>
+
+    <div class="custom-login">
+        <p class="custom-text"> Already have an account? &ensp; <a class="btn btn-primary" href="{% url 'account_login' %}" role="button">Signin</a> </p>
+        <p class="custom-text"> Register Here for an Account &ensp; <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">Register</a></p>
+    </div>
+</div>
+
+<div class="color-bg-custom"></div>
+
+<!-- Jquery Core Js --> 
+<script src="{% static 'usermanagement/bundles/libscripts.bundle.js' %}"></script> <!-- Lib Scripts Plugin Js --> 
+<script src="{% static 'usermanagement/bundles/vendorscripts.bundle.js' %}"></script> <!-- Lib Scripts Plugin Js --> 
+
+<script src="{% static 'usermanagement/bundles/chartscripts.bundle.js' %}"></script> <!-- Chart Plugins Js -->
+<script src="{% static 'usermanagement/bundles/sparklinescripts.bundle.js' %}"></script> <!-- Chart Plugins Js -->
+
+<script src="{% static 'usermanagement/bundles/mainscripts.bundle.js' %}"></script><!-- Custom Js -->
+<script src="{% static 'usermanagement/js/pages/index.js' %}"></script>
+<script src="{% static 'usermanagement/js/pages/charts/sparkline.min.js' %}"></script>
+</body>
+
+<!-- Mirrored from thememakker.com/templates/swift/hospital/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 20 Nov 2021 08:11:50 GMT -->
+</html>
+
+
+
