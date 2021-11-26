@@ -1,0 +1,45 @@
+
+<section class="content patients">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>All Patients</h2>
+            <small class="text-muted">Polyclinic Fultang</small>
+        </div>
+        {% if messages %}
+            <div>
+                <ul>
+                {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        <strong>{{message}}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <div class="row clearfix">
+        {% for patient in patients %}
+            <div class="col-lg-4 col-md-6 col-sm-12">
+                <div class="card all-patients">
+                    <div class="body">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-4 text-center m-b-0">
+                                <a href="{% url 'usermanagement:patient_profile' role='Receptionist' patient_name=patient.user.username %}" class="p-profile-pix"><img src="http://via.placeholder.com/130x130" alt="user" class="img-thumbnail img-fluid"></a>
+                            </div>
+                            <div class="col-md-8 col-sm-8 m-b-0">
+                                <h5 class="m-b-0"> {{patient.user.first_name}} {{patient.user.last_name}} </h5></a></h5> <small>{{patient.gender}}</small>
+                                <address class="m-b-0">
+                                    {{patient.user.address}}<br>
+                                    <abbr title="Phone">P:</abbr> {{patient.user.tel}}
+                                </address>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</section>

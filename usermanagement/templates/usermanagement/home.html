@@ -64,44 +64,7 @@
                 </ul>
             </li>
             <!-- #END# Notifications --> 
-            <!-- Tasks -->
-            <li class="dropdown"> <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button"><i class="zmdi zmdi-menu"></i></a>
-                <ul class="dropdown-menu">
-                    <li class="header">Choose a Role</li>
-                    <li class="body">
-                        <ul class="menu tasks">
-                        {% if 'Patient' in roles %}
-                            <li>
-                                <a href="{% url 'usermanagement:patient' %}">
-                                    <h4>Patient</h4>
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if 'Doctor' in roles %}
-                            <li>
-                                <a href="{% url 'usermanagement:doctor' %}">
-                                    <h4>Doctor</h4>
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if 'Receptionist' in roles %}
-                            <li>
-                                <a href="{% url 'usermanagement:receptionist' %}">
-                                    <h4>Receptionist</h4>
-                                </a>
-                            </li>
-                        {% endif %}
-                        {% if 'Nurse' in roles%}
-                            <li>
-                                <a href="{% url 'usermanagement:nurse' %}">
-                                    <h4>Nurse</h4>
-                                </a>
-                            </li>
-                        {% endif %}
-                        </ul>
-                </ul>
-            </li>
-            <!-- #END# Tasks -->
+            {% include 'usermanagement/roles.html' %}
         </ul>
     </div>
 </nav>

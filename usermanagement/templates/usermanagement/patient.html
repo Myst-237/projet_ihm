@@ -1,1 +1,5 @@
-patient
+{% extends "usermanagement/base-patient.html" %} 
+{% block title %} All Patients {% endblock %} 
+{% block body %}
+    {% include "usermanagement/patient-profile.html" %}
+{% endblock %}

@@ -15,6 +15,10 @@
 <link rel="stylesheet" href="{% static 'usermanagement/plugins/morrisjs/morris.css' %}"/>
 <!-- Custom Css -->
 <link rel="stylesheet" href="{% static 'usermanagement/css/main.css' %}"/>
+<link rel="stylesheet" href="{% static 'usermanagement/css/mystyle.css' %}"/>
+{% block extra_head %}
+
+{% endblock %}
 </head>
 
 <body class="theme-cyan">
@@ -89,6 +93,7 @@
                 </ul>
             </li>
             <!-- #END# Notifications --> 
+            {% include 'usermanagement/roles.html'%}
         </ul>
     </div>
 </nav>
@@ -118,35 +123,12 @@
         </div>
         <!-- #User Info --> 
         <!-- Menu -->
-        <div class="menu">
-            <ul class="list">
-                <li class="header">MAIN NAVIGATION</li>
-                <li class="active open"><a href="index-2.html"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li>                                               
-                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span>Patients</span> </a>
-                    <ul class="ml-menu">
-                        <li><a href="{% url 'usermanagement:receptionist' %}">Add Patient</a></li>   
-                        <li><a href="{% url 'usermanagement:receptionist_all_patients' %}">All Patients</a></li>                    
-                    </ul>
-                </li>
-                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-calendar-check"></i><span>Appointment</span> </a>
-                    <ul class="ml-menu">
-                        <li><a href="{% url 'usermanagement:book_appointment' %}">Book Appointment</a></li>
-                        <li><a href="{% url 'usermanagement:modify_appointment' %}"> Modify Appointment </a></li>
-                    </ul>
-                </li>
-                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-balance-wallet"></i><span>Payments</span> </a>
-                    <ul class="ml-menu">
-                        <li> <a href="{% url 'usermanagement:add_payment' %}">Add Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:modify_payment' %}">Modify Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:payments' %}">Payments</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
+        {% block dashbord %}
+            
+        {% endblock %}
         <!-- #Menu -->
     </aside>
 </section>
-
 {% block body %}
 
 {% endblock %}

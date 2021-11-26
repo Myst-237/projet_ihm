@@ -27,6 +27,11 @@ Speciality = [
     ('Radiology', 'Radiology'),
 ]
 
+Gender = [
+    ('Male', 'Male'),
+    ('Female', 'Female'),
+]
+
 #the custom user model that extends the django base user model adding the required attributes
 class CustomUser(AbstractUser):
     role = ArrayField(models.CharField(max_length = 50, choices = Roles), default = list)
@@ -40,15 +45,41 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username 
     
+    #add a role to a user
+    def add_role(self, role):
+        if role in self.role:
+            pass
+        else:
+            self.role.append(role)
+            self.save()
+            
+    #add patient/user information       
+    def add_user_info(self, first_name, last_name, tel, address, date_of_birth, profession):
+        self.first_name = first_name
+        self.last_name = last_name
+        self.tel = tel
+        self.address = address
+        self.date_of_birth = date_of_birth
+        self.profession = profession
+        self.save()
+    
  
  #patient model   
 class Patient(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     place_of_birth = models.CharField(max_length=200)
-    next_of_kin = models.CharField(max_length=100)
-    next_of_kin_tel = models.CharField(max_length=100)
     person_to_contact = models.CharField(max_length=100)
     person_to_contact_tel = models.CharField(max_length=100)
+    age  = models.CharField(max_length=10, blank = True, null = True)
+    gender = models.CharField(max_length=10, blank = True, null = True, choices = Gender)
+    created = models.DateTimeField(editable=False)
+    modified = models.DateTimeField()
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Patient, self).save(*args, **kwargs)
     
     def __str__(self):
         return self.user.username
@@ -94,15 +125,15 @@ class DoctorReport(models.Model):
     lab_tests = models.ForeignKey(LabTest, on_delete = models.CASCADE)
     admitted = models.BooleanField(default = False)
     remarks = models.TextField(blank = True, null = True)
-    created = models.DateField()
-    modified = models.DateField()
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
     
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
-        return super(User, self).save(*args, **kwargs)
+        return super(DoctorReport, self).save(*args, **kwargs)
     
     def __str__(self):
         return f"{self.patient.username}'s Report by {self.doctor.username}"    
@@ -112,23 +143,23 @@ class DoctorReport(models.Model):
 class PatientVitalCard(models.Model):
     patient = models.ForeignKey(Patient, on_delete = models.CASCADE)
     temperature = models.CharField(max_length=100)
-    pulse = models.CharField(max_length=100)
-    respiration_rate = models.CharField(max_length=100)
+    pulse = models.CharField(max_length=100, blank = True, null = True)
+    respiration_rate = models.CharField(max_length=100, blank = True, null = True)
     blood_pressure = models.CharField(max_length=100)
-    oxygen_saturation = models.CharField(max_length=200)
-    wieght = models.CharField(max_length=100)
-    created = models.DateField()
-    modified = models.DateField()
+    oxygen_saturation = models.CharField(max_length=200, null=True, blank=True)
+    weight = models.CharField(max_length=100)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
     
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
-        return super(User, self).save(*args, **kwargs)
+        return super(PatientVitalCard, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"Vitals for {self.patient.username}"
+        return f"Vitals for {self.patient.user.username} <{self.created}> "
     
     
 #Receptionist for patient Registration 

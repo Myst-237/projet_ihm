@@ -1,1 +1,138 @@
-nurse
+{% extends "usermanagement/base-nurse.html" %} 
+{% block title %} Nurse {% endblock %} 
+
+{% block body %}
+<section class="content">
+  <div class="container-fluid">
+        {% if messages %}
+                <div>
+                    <ul>
+                    {% for message in messages %}
+                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                            <strong>{{message}}</strong>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                    </div>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        <div class="row clearfix">
+			<div class="col-lg-12 col-md-12 col-sm-12">
+				<div class="card">
+					<div class="header">
+						<h2>Patient Vitals <small>Collecting Patient Vitals...</small> </h2>
+						<ul class="header-dropdown">
+							<li class="dropdown"> <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="zmdi zmdi-more-vert"></i></a>
+								<ul class="dropdown-menu pull-right">
+									<li><a href="{% url 'usermanagement:nurse' %}" class=" waves-effect waves-block">Refresh Form</a></li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+                        <form action="{% url 'usermanagement:nurse' %}" method="post">
+                        {% csrf_token %}
+                            <div class="body">
+                                <div class="row clearfix">
+                                    <div class="col-lg-3 col-md-6 col-sm-12">
+                                        <div class="form-group">
+                                        <div class="form-line">
+                                            <input type="text" class="form-control" placeholder="Search Patient..." id="userInput" onkeyup="Func()"/>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3 col-md-6 col-sm-12">
+                                        <div class="form-group drop-custum" id="Dropdown">
+                                        <select class="form-control show-tick" name="selected_patient" required>
+                                            <option value="">-- Patient --</option>
+                                            {% for patient in all_patients %}
+                                            <option value="{{patient}}"> {{patient}} </option>
+                                            {% endfor %}
+                                        </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row clearfix">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" placeholder="Temperature" name="temperature" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" placeholder="Pulse" name="pulse">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" placeholder="Respiration Rate" name="respiration_rate">
+                                            </div>
+                                        </div>
+                                    </div>                        
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="datepicker form-control" placeholder="Blood Pressure" name="blood_pressure" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" placeholder="Oxygen Saturation" name="oxygen_saturation">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <div class="form-line">
+                                                <input type="text" class="form-control" placeholder="Weight" name="weight">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <button type="submit" class="btn btn-raised g-bg-cyan">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+				</div>
+			</div>
+		</div>  
+    </div>
+</section>
+
+<script>
+function Func() {
+  var input, filter, a;
+
+  // take user input
+  input = document.getElementById("userInput");
+  
+  // convert the input to upper case letter for easy comparison
+  filter = input.value.toUpperCase();
+
+  div = document.getElementById("Dropdown");
+
+  // get all the options as a list
+  a = div.getElementsByTagName("option");
+
+  // iterate through the entire list and output relevant results if found
+  for (var i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+{% endblock %}
