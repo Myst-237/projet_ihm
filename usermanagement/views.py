@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from .models import CustomUser, Receptionist, Patient, Doctor, PatientVitalCard
+from .models import CustomUser, Receptionist, Patient, Doctor, PatientVitalCard, Consultation
 
 #view functions
 
@@ -29,8 +29,6 @@ def home(request):
 #the receptionist view
 @login_required
 def receptionist(request):
-    #logic for get requests
-    all_users = [user.username for user in CustomUser.objects.all()]
     
     #logic for post requests
     if request.method == 'POST':
@@ -77,14 +75,46 @@ def receptionist(request):
             user.add_user_info(first_name, last_name, tel, address, date_of_birth, profession)
             
             messages.info(request, "Patient has been registered")
-            return redirect("usermanagement:receptionist_all_patients")
+            return redirect("usermanagement:all_patients", role = "Receptionist")
         
         
     context = {
-        'all_users': all_users
+        'all_users': [user.username for user in CustomUser.objects.all()],
+        'all_patients': [patient.user.username for patient in Patient.objects.all()],
+        'all_doctors': [doctor.user.username for doctor in Doctor.objects.all()]
     }
     return render(request, 'usermanagement/receptionist.html',context)
-    
+
+#consultation view 
+def consultation(request):
+    if request.method == 'POST':
+        selected_patient = request.POST.get('selected_patient')
+        selected_doctor = request.POST.get('selected_doctor')
+        patient = Patient.objects.get(user=CustomUser.objects.get(username=selected_patient))
+        doctor = Doctor.objects.get(user=CustomUser.objects.get(username=selected_doctor))
+        try:
+            consultation = Consultation.objects.get(patient=patient)
+            if consultation.status == "Pending":
+                messages.info(request, f"{patient} has a Pending consultation appointment with {consultation.doctor.user.username}")
+                return redirect("usermanagement:receptionist")
+            if consultation.status == "On Hold":
+                messages.info(request, f"{patient}'s consultation appointment is still On Hold")
+                return redirect("usermanagement:receptionist")
+            if consultation.status == "Finished":
+                Consultation.objects.create(
+                patient = patient,
+                doctor = doctor,
+                status = 'Pending'
+                )
+        except ObjectDoesNotExist:
+            Consultation.objects.create(
+                patient = patient,
+                doctor = doctor,
+                status = 'Pending'
+                )
+    messages.info(request, "Consultation appointment succefully added to queue")  
+    return redirect("usermanagement:receptionist")
+
 
 #receptionist view for searching all patients
 @login_required
@@ -109,8 +139,13 @@ def patient_profile(request,role, patient_name):
         except ObjectDoesNotExist:
             messages.info(request, "Patient does not exist")
             return redirect('/home')
+        try:
+            vitals = PatientVitalCard.objects.filter(patient = patient).latest('created') 
+        except ObjectDoesNotExist:
+            vitals = None
         context = {
-            'patient': patient
+            'patient': patient,
+            'vitals': vitals
         }
         if role == 'Receptionist':
             return render(request, 'usermanagement/receptionist-patient-profile.html',context)

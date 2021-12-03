@@ -1,6 +1,6 @@
 from django.urls import path, include
 from .views import (index,home,receptionist,all_patients,book_appointment,add_payment,modify_appointment,
-                    modify_payment,payments,patient_profile,doctor,nurse)
+                    modify_payment,payments,patient_profile,doctor,nurse,consultation)
 
 app_name = 'usermanagement'
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('receptionist/add_payment', add_payment, name="add_payment"),
     path('receptionist/modify_payment', modify_payment, name="modify_payment"),
     path('receptionist/payments', payments, name="payments"),
+    path('receptionist/consultation', consultation, name="consultation"),
     path('<role>/profile/<patient_name>/', patient_profile, name="patient_profile"),
     path('nurse/', nurse , name="nurse"),
     path('doctor/', doctor , name="doctor"),

@@ -26,7 +26,7 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <div class="card">
           <div class="header">
-            <h2>Basic Information <small>Description text here...</small></h2>
+            <h2>Register Patient <small>Patient Registration Form...</small></h2>
             <ul class="header-dropdown m-r--5">
               <li class="dropdown">
                 <a
@@ -278,56 +278,48 @@
         <div class="card">
           <div class="header">
             <h2>
-              Registration Information <small>Description text here...</small>
+              Register Consultation <small>Asign a Doctor for Patient Consultation...</small>
             </h2>
           </div>
+          <form method="post" action="{% url 'usermanagement:consultation' %}">
+            {% csrf_token %}
           <div class="body">
             <div class="row clearfix">
-              <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="form-group">
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group">
                   <div class="form-line">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Doctor Name"
-                    />
+                      <input type="text" class="form-control" placeholder="Search Patient..." id="userInput" onkeyup="Func()"/>
                   </div>
-                </div>
+                  </div>
               </div>
-              <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="form-group">
-                  <div class="form-line">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Staff on Duty"
-                    />
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group drop-custum" id="Dropdown">
+                  <select class="form-control show-tick" name="selected_patient" required>
+                      <option value="">-- Patient --</option>
+                      {% for patient in all_patients %}
+                      <option value="{{patient}}"> {{patient}} </option>
+                      {% endfor %}
+                  </select>
                   </div>
-                </div>
               </div>
             </div>
             <div class="row clearfix">
-              <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="form-group">
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group">
                   <div class="form-line">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Ward No."
-                    />
+                      <input type="text" class="form-control" placeholder="Search Doctor..." id="userInput" onkeyup="Func()"/>
                   </div>
-                </div>
+                  </div>
               </div>
-              <div class="col-lg-6 col-md-6 col-sm-12">
-                <div class="form-group">
-                  <div class="form-line">
-                    <input
-                      type="text"
-                      class="datetimepicker form-control"
-                      placeholder="Please choose date & time..."
-                    />
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group drop-custum" id="Dropdown">
+                  <select class="form-control show-tick" name="selected_doctor" required>
+                      <option value="">-- Doctor --</option>
+                      {% for doctor in all_doctors %}
+                      <option value="{{doctor}}"> {{doctor}} </option>
+                      {% endfor %}
+                  </select>
                   </div>
-                </div>
               </div>
               <div class="col-sm-12">
                 <button type="submit" class="btn btn-raised g-bg-cyan">
@@ -335,6 +327,7 @@
                 </button>
               </div>
             </div>
+            </form>
           </div>
         </div>
       </div>

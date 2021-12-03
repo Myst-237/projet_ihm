@@ -32,6 +32,11 @@ Gender = [
     ('Female', 'Female'),
 ]
 
+Status = [
+    ('Pending', 'Pending'),
+    ('Finished', 'Finished'),
+    ('On Hold', 'On Hold'),
+]
 #the custom user model that extends the django base user model adding the required attributes
 class CustomUser(AbstractUser):
     role = ArrayField(models.CharField(max_length = 50, choices = Roles), default = list)
@@ -161,6 +166,23 @@ class PatientVitalCard(models.Model):
     def __str__(self):
         return f"Vitals for {self.patient.user.username} <{self.created}> "
     
+#Consultation queue
+class Consultation(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices = Status)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Consultation, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.doctor.user.username} to consult {self.patient.user.username}"
     
 #Receptionist for patient Registration 
 class Receptionist(models.Model):

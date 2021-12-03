@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .forms import CustomUserCreationForm, CustomUserChangeForm
-from .models import CustomUser,Receptionist,Patient,Doctor, PatientVitalCard
+from .models import CustomUser,Receptionist,Patient,Doctor, PatientVitalCard, Consultation
 
 # Register your models here.
 class CustomUserAdmin(UserAdmin):
@@ -32,3 +32,4 @@ admin.site.register(Receptionist)
 admin.site.register(Patient)
 admin.site.register(Doctor)
 admin.site.register(PatientVitalCard)
+admin.site.register(Consultation)
