@@ -5,7 +5,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from .models import CustomUser, Receptionist, Patient, Doctor, PatientVitalCard, Consultation
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
-#view functions
+
+
+#ALL FUNCTION BASED VIEWS
 
 #function to verify if a user has the write to access the patient profile    
 def has_patient_profile_permission(request, patient_name):
@@ -114,7 +116,7 @@ def consultation(request):
                 status = 'Pending'
                 )
     messages.info(request, "Consultation appointment succefully added to queue")  
-    return redirect("usermanagement:consultation_queue")
+    return redirect("usermanagement:consultation_queue", consultant='Receptionist')
 
 
 #receptionist view for searching all patients
@@ -150,6 +152,8 @@ def patient_profile(request,role, patient_name):
         }
         if role == 'Receptionist':
             return render(request, 'usermanagement/receptionist-patient-profile.html',context)
+        elif role == 'Doctor':
+            return render(request, 'usermanagement/doctor-patient-profile.html',context)
         elif request.user.username == patient_name:
             return render(request, 'usermanagement/patient.html',context)
         else:
@@ -196,17 +200,23 @@ def nurse(request):
     return render(request, 'usermanagement/nurse.html', context)
 
 #consultation queue 
-def consultation_queue(request):
-    consultaions = Consultation.objects.all()
-    context = {
-        'consultations': consultaions
-    }
-    return render(request, 'usermanagement/consultations.html', context)
-
-class ConsultationDeleteView(DeleteView):
-    model = Consultation
-    success_url = reverse_lazy('usermanagement:consultation_queue')
+def consultation_queue(request, consultant):
+    if consultant == 'Receptionist':
+        consultaions = Consultation.objects.all()
+        context = {
+        'consultations': consultaions,
+        'consultant': consultant
+        } 
+        return render(request, 'usermanagement/general-consultation-queue.html', context)
     
+    if consultant == 'Doctor':
+        consultaions = Consultation.objects.filter(doctor=Doctor.objects.get(user=request.user))
+        context = {
+        'consultations': consultaions,
+        'consultant': consultant
+        } 
+        return render(request, 'usermanagement/doctor-consultation-queue.html', context)
+
 def add_consultation(request):
     context = {
         'all_users': [user.username for user in CustomUser.objects.all()],
@@ -215,11 +225,59 @@ def add_consultation(request):
     }
     return render(request, 'usermanagement/add-consultation.html',context)
 
+
+
+
+
+# ALL CLASS BASED VIEWS
+
+#consultation delete view
+class ConsultationDeleteView(DeleteView):
+    model = Consultation
+    success_url = reverse_lazy('usermanagement:consultation_queue', kwargs = {'consultant': 'Receptionist'})
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 #doctor functionality
 @login_required
 def doctor(request):
-        return render(request, 'usermanagement/doctor.html')
-    
+        return redirect('usermanagement:consultation_queue', consultant = 'Doctor')
 #functionality for booking appointments
 @login_required
 def book_appointment(request):

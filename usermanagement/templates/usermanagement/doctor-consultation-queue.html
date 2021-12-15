@@ -1,11 +1,11 @@
-{% extends "usermanagement/base-receptionist.html" %} 
+{% extends "usermanagement/base-doctor.html" %} 
 {% block title %} Consultations {% endblock %} 
 
 {% block body %}
 <section class="content">
     <div class="container-fluid">
         {% if messages %}
-        <div>
+        <div> 
             <ul>
             {% for message in messages %}
             <div class="alert alert-primary alert-dismissible fade show" role="alert">
@@ -54,7 +54,7 @@
                                     <td>{{ consultation.doctor}}</td>
                                     <td>{{ consultation.status}}</td>
                                     <td>{{ consultation.modified}}</td>
-                                    <td><a href="{% url 'usermanagement:consultation_delete' consultation.id %}"><button class="btn btn-danger"> Delete </button></a></td>
+                                    <td><a href="{% url 'usermanagement:patient_profile' role='Doctor' patient_name=consultation.patient.user.username %}"><button class="btn btn-primary"> Consult </button></a></td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

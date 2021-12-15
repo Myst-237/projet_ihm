@@ -5,7 +5,7 @@
         <div class="menu">
             <ul class="list">
                 <li class="header">MAIN NAVIGATION</li>
-                <li class="active open"><a href="{% url 'usermanagement:home' %}"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li>                                               
+                <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li>                                               
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span>Patients</span> </a>
                     <ul class="ml-menu">
                         <li><a href="{% url 'usermanagement:receptionist' %}">Add Patient</a></li>   
@@ -15,7 +15,7 @@
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-calendar-check"></i><span>Consultations</span> </a>
                     <ul class="ml-menu">
                         <li><a href="{% url 'usermanagement:add_consultation' %}">Add Consultation</a></li>   
-                        <li><a href="{% url 'usermanagement:consultation_queue' %}">Consultation Queue</a></li>                    
+                        <li><a href="{% url 'usermanagement:consultation_queue' 'Receptionist' %}">Consultation Queue</a></li>                    
                     </ul>
                 </li>
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-calendar-check"></i><span>Appointment</span> </a>
