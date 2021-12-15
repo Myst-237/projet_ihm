@@ -12,6 +12,12 @@
                         <li><a href="{% url 'usermanagement:all_patients' role='Receptionist' %}">All Patients</a></li>                    
                     </ul>
                 </li>
+                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-calendar-check"></i><span>Consultations</span> </a>
+                    <ul class="ml-menu">
+                        <li><a href="{% url 'usermanagement:add_consultation' %}">Add Consultation</a></li>   
+                        <li><a href="{% url 'usermanagement:consultation_queue' %}">Consultation Queue</a></li>                    
+                    </ul>
+                </li>
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-calendar-check"></i><span>Appointment</span> </a>
                     <ul class="ml-menu">
                         <li><a href="{% url 'usermanagement:book_appointment' %}">Book Appointment</a></li>

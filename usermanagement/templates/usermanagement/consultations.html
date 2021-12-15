@@ -1,0 +1,70 @@
+{% extends "usermanagement/base-receptionist.html" %} 
+{% block title %} Consultations {% endblock %} 
+
+{% block body %}
+<section class="content">
+    <div class="container-fluid">
+        {% if messages %}
+        <div>
+            <ul>
+            {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <strong>{{message}}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+            {% endfor %}
+            </ul>
+        </div>
+         {% endif %}
+        <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="card">
+                    <div class="header">
+                        <h2> Consultation Queue <small>New patient consultation queue</small> </h2>
+                        <ul class="header-dropdown">
+                            <li class="dropdown"> <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="zmdi zmdi-more-vert"></i></a>
+                                <ul class="dropdown-menu float-right">
+                                    <li><a href="javascript:void(0);" class=" waves-effect waves-block">Action</a></li>
+                                    <li><a href="javascript:void(0);" class=" waves-effect waves-block">Another action</a></li>
+                                    <li><a href="javascript:void(0);" class=" waves-effect waves-block">Something else here</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th> Patient Name </th>
+                                    <th> Doctor Name </th>
+                                    <th> Status </th>
+                                    <th> Date </th>
+                                    <th>  </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    {% for consultation in consultations %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ consultation.patient}}</td>
+                                    <td>{{ consultation.doctor}}</td>
+                                    <td>{{ consultation.status}}</td>
+                                    <td>{{ consultation.modified}}</td>
+                                    <td><a href="{% url 'usermanagement:consultation_delete' consultation.id %}"><button class="btn btn-danger"> Delete </button></a></td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

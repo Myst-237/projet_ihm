@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .models import CustomUser, Receptionist, Patient, Doctor, PatientVitalCard, Consultation
-
+from django.views.generic.edit import DeleteView
+from django.urls import reverse_lazy
 #view functions
 
 #function to verify if a user has the write to access the patient profile    
@@ -113,7 +114,7 @@ def consultation(request):
                 status = 'Pending'
                 )
     messages.info(request, "Consultation appointment succefully added to queue")  
-    return redirect("usermanagement:receptionist")
+    return redirect("usermanagement:consultation_queue")
 
 
 #receptionist view for searching all patients
@@ -193,7 +194,27 @@ def nurse(request):
             return redirect('/nurse')
         
     return render(request, 'usermanagement/nurse.html', context)
+
+#consultation queue 
+def consultation_queue(request):
+    consultaions = Consultation.objects.all()
+    context = {
+        'consultations': consultaions
+    }
+    return render(request, 'usermanagement/consultations.html', context)
+
+class ConsultationDeleteView(DeleteView):
+    model = Consultation
+    success_url = reverse_lazy('usermanagement:consultation_queue')
     
+def add_consultation(request):
+    context = {
+        'all_users': [user.username for user in CustomUser.objects.all()],
+        'all_patients': [patient.user.username for patient in Patient.objects.all()],
+        'all_doctors': [doctor.user.username for doctor in Doctor.objects.all()]
+    }
+    return render(request, 'usermanagement/add-consultation.html',context)
+
 #doctor functionality
 @login_required
 def doctor(request):

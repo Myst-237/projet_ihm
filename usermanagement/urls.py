@@ -1,7 +1,5 @@
 from django.urls import path, include
-from .views import (index,home,receptionist,all_patients,book_appointment,add_payment,modify_appointment,
-                    modify_payment,payments,patient_profile,doctor,nurse,consultation)
-
+from .views import *
 app_name = 'usermanagement'
 
 urlpatterns = [
@@ -18,4 +16,7 @@ urlpatterns = [
     path('<role>/profile/<patient_name>/', patient_profile, name="patient_profile"),
     path('nurse/', nurse , name="nurse"),
     path('doctor/', doctor , name="doctor"),
+    path('consultation_queue/', consultation_queue, name="consultation_queue"),
+    path('delete_consultation/<int:pk>/', ConsultationDeleteView.as_view(), name="consultation_delete"),
+    path('add_consultation', add_consultation, name="add_consultation")
 ]

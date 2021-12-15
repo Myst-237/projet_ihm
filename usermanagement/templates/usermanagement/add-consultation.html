@@ -1,0 +1,114 @@
+{% extends "usermanagement/base-receptionist.html" %} 
+{% block title %} Reception {% endblock %} 
+
+{% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="block-header">
+      <h2>Add Patient</h2>
+      <small class="text-muted">Polyclinic Fultang</small>
+    </div>
+    {% if messages %}
+            <div>
+                <ul>
+                {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        <strong>{{message}}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    <div class="row clearfix">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="header">
+            <h2>
+              Register Consultation <small>Asign a Doctor for Patient Consultation...</small>
+            </h2>
+          </div>
+          <form method="post" action="{% url 'usermanagement:consultation' %}">
+            {% csrf_token %}
+          <div class="body">
+            <div class="row clearfix">
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group">
+                  <div class="form-line">
+                      <input type="text" class="form-control" placeholder="Search Patient..." id="userInput" onkeyup="Func()"/>
+                  </div>
+                  </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group drop-custum" id="Dropdown">
+                  <select class="form-control show-tick" name="selected_patient" required>
+                      <option value="">-- Patient --</option>
+                      {% for patient in all_patients %}
+                      <option value="{{patient}}"> {{patient}} </option>
+                      {% endfor %}
+                  </select>
+                  </div>
+              </div>
+            </div>
+            <div class="row clearfix">
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group">
+                  <div class="form-line">
+                      <input type="text" class="form-control" placeholder="Search Doctor..." id="userInput" onkeyup="Func()"/>
+                  </div>
+                  </div>
+              </div>
+              <div class="col-lg-3 col-md-6 col-sm-12">
+                  <div class="form-group drop-custum" id="Dropdown">
+                  <select class="form-control show-tick" name="selected_doctor" required>
+                      <option value="">-- Doctor --</option>
+                      {% for doctor in all_doctors %}
+                      <option value="{{doctor}}"> {{doctor}} </option>
+                      {% endfor %}
+                  </select>
+                  </div>
+              </div>
+              <div class="col-sm-12">
+                <button type="submit" class="btn btn-raised g-bg-cyan">
+                  Submit
+                </button>
+              </div>
+            </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+function Func() {
+  var input, filter, a;
+
+  // take user input
+  input = document.getElementById("userInput");
+  
+  // convert the input to upper case letter for easy comparison
+  filter = input.value.toUpperCase();
+
+  div = document.getElementById("Dropdown");
+
+  // get all the options as a list
+  a = div.getElementsByTagName("option");
+
+  // iterate through the entire list and output relevant results if found
+  for (var i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "usermanagement/base-receptionist.html" %} 
+{% block title %} Consultations {% endblock %} 
+{% load crispy_forms_tags %}
+
+{% block body %}
+<section class="content">
+    <div class="container-fluid">
+        <form method="post">{% csrf_token %}
+            <p>Are you sure you want to delete "{{ object }}"?</p>
+            {{ form|crispy}}
+            <button class="btn btn-primary" type="submit"> Confirm </button>
+        </form>
+    </div>
+</section>
+
+{% endblock %}

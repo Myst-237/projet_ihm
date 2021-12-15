@@ -182,7 +182,7 @@ class Consultation(models.Model):
         return super(Consultation, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.doctor.user.username} to consult {self.patient.user.username}"
+        return f"{self.doctor.user.username} / {self.patient.user.username} consultation"
     
 #Receptionist for patient Registration 
 class Receptionist(models.Model):
