@@ -1,10 +1,11 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .models import *
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
+from django.template import RequestContext
 
 
 #ALL FUNCTION BASED VIEWS
@@ -28,6 +29,17 @@ def index(request):
 @login_required
 def home(request):
     return render(request, 'usermanagement/home.html')
+
+def handler404(request, *args, **argv):
+    response = render(request, 'usermanagement/404.html')
+    response.status_code = 404
+    return response
+
+
+def handler500(request, *args, **argv):
+    response = render(request, 'usermanagement/500.html')
+    response.status_code = 500
+    return response
 
 #the receptionist view
 @login_required
@@ -115,7 +127,7 @@ def consultation(request):
                 status = 'Pending'
                 )
         #if there isn't any on going consultation, create a new consultation
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, IndexError):
             Consultation.objects.create(
                 patient = patient,
                 doctor = doctor,
@@ -175,6 +187,7 @@ def patient_profile(request,role, patient_name):
             'vitals': vitals,
             'conId': request.GET.get('conId'),
             'consultation': consultation,
+            'consultations':Consultation.objects.filter(patient=patient),
             'role': role
         }
         #use the role to determine read/write access to the patient profile
@@ -274,6 +287,35 @@ def consultation_queue(request, consultant):
         } 
         return render(request, 'usermanagement/doctor-consultation-queue.html', context)
     
+    #if the client is a patient
+    if consultant == 'Patient':
+        #return the list of consultations that have thesame docotor in common with the patient making the request
+        try:
+            consultation = Consultation.objects.filter(patient=Patient.objects.get(user=request.user))[0]
+        except (IndexError, ObjectDoesNotExist):
+            consultations = None
+            consultation = None
+            
+        consultation_list = []
+        if consultation is not None:
+            consultations = Consultation.objects.filter(doctor=consultation.doctor)
+            for consultation in consultations:
+                if consultation.status == 'Pending' or consultation.status == 'On Hold':
+                    consultation_list.append(consultation)
+                    
+        #get the number of the next patient to be consulted in queue
+        next_in_queue = None
+        for consultation in consultation_list:
+            if consultation.status == 'Pending':
+                next_in_queue = consultation.id
+                break
+            
+        context={
+            'consultations': consultation_list,
+            'consultant': consultant,
+            'next_in_queue': next_in_queue
+        }
+        return render(request, 'usermanagement/patient-consultation-queue.html', context)
 
 #function to obtain context data for adding a consultation
 def add_consultation(request):
@@ -346,6 +388,38 @@ def doctor_report(request, conId):
             return redirect('/doctor')
         
     return redirect('/Doctor/profile/'+consultation.patient.user.username+'/?conId='+str(consultation.id))
+
+
+#consultation info view
+def consultation_info(request, conId):
+    consultation = get_object_or_404(Consultation, pk=conId)
+    report = get_object_or_404(DoctorReport, consultation=consultation)
+    lab_tests = get_object_or_404(LabTest, consultation=consultation)
+    #get the consultation doctor so he can make modifications to the consultation
+    context = {
+        'consultation': consultation,
+        'patient': consultation.patient,
+        'report': report,
+        'lab_tests': lab_tests,
+        'conId': consultation.id
+        }
+    return render(request, 'usermanagement/consultation-info.html', context)
+
+
+#modify prescription
+def modify_prescription(request, conId):
+    consultation = Consultation.objects.get(id=conId)
+    try:
+        Report = DoctorReport.objects.get(consultation = consultation)
+    except ObjectDoesNotExist:
+        messages.info(request, "No such Report")
+        return redirect('/home')
+    
+    prescriptions = request.POST.get('prescriptions')
+    if prescriptions is not None:
+        Report.prescriptions = prescriptions
+        Report.save() 
+    return redirect('usermanagement:consultation_info', conId=consultation.id)
 
 
 #doctor functionality

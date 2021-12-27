@@ -1,15 +1,7 @@
 {% extends "usermanagement/base-executive.html" %} 
 {% block title %} Nurse{% endblock %} 
 {% block dashbord %}                                         
-                <li><a href="{% url 'usermanagement:nurse' %}"><i class="zmdi zmdi-account-o"></i><span>Take Patient Vitals</span> </a>
-                    
-                </li>
-                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-balance-wallet"></i><span>Payments</span> </a>
-                    <ul class="ml-menu">
-                        <li> <a href="{% url 'usermanagement:add_payment' %}">Add Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:modify_payment' %}">Modify Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:payments' %}">Payments</a></li>
-                    </ul>
+                <li><a href="{% url 'usermanagement:nurse' %}"><i class="zmdi zmdi-account-o"></i><span>Take Patient Vitals</span> </a>           
                 </li>
 {% endblock %}
 {% block body %}

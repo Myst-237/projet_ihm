@@ -1,4 +1,4 @@
-{% extends "usermanagement/base-receptionist.html" %} 
+{% extends "usermanagement/base-patient.html" %} 
 {% block title %} Consultations {% endblock %} 
 
 {% block body %}
@@ -42,12 +42,12 @@
                                     <th> Patient Name </th>
                                     <th> Doctor Name </th>
                                     <th> Status </th>
-                                    <th> Date created </th>
+                                    <th> Date Created </th>
                                     <th>  </th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                    {% for consultation in consultations %}
+                                {% for consultation in consultations %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ consultation.patient}}</td>
@@ -57,9 +57,10 @@
                                         {% if consultation.status == 'Pending' %}<span class="label label-info">{% endif %}
                                         {{ consultation.status}}</span> </td>
                                     <td>{{ consultation.created}}</td>
-                                    {% if consultation.status == 'Pending'%}
-                                    <td><a href="{% url 'usermanagement:consultation_delete' consultation.id %}"><button class="btn btn-sm btn-danger"> Delete </button></a></td>
-                                    {% endif %}
+                                    <td> {% if consultation.id == next_in_queue%} 
+                                        <i class="material-icons" style="color:#4CAF50">check_circle</i>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

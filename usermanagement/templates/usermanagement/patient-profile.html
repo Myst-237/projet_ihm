@@ -8,7 +8,11 @@
         <div class="row clearfix">
             <div class="col-lg-4 col-md-12 col-sm-12">
                 <div class=" card patient-profile">
-                    <img src="{% static 'usermanagement/images/image-1.jpg' %}" class="img-fluid" alt="">                              
+                    {% if patient.user.profile_pic %}
+                        <img src="{{patient.user.profile_pic.url}}" class="img-fluid" alt=""> 
+                    {% else %}    
+                        <img src="{% static 'usermanagement/images/image-1.jpg' %}" class="img-fluid" alt="">                               
+                    {% endif %}
                 </div>
                 <div class="card">
                     <div class="header">
@@ -41,7 +45,8 @@
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active"data-toggle="tab"  href="#report">Report Page</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#timeline">Timeline</a></li>
+                            <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#consultations">Consultations</a></li>
+
                         </ul>
                         
                         <!-- Tab panes -->
@@ -175,57 +180,31 @@
                                 </div>
                             </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="timeline">
-                                <div class="timeline-body">
-                                    <div class="timeline m-border">
-                                        <div class="timeline-item">
-                                            <div class="item-content">
-                                                <div class="text-small">Just now</div>
-                                                <p>Discharge.</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-info">
-                                            <div class="item-content">
-                                                <div class="text-small">11:30</div>
-                                                <p>Routine Checkup</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-warning border-l">
-                                            <div class="item-content">
-                                                <div class="text-small">10:30</div>
-                                                <p>Operation </p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-warning">
-                                            <div class="item-content">
-                                                <div class="text-small">3 days ago</div>
-                                                <p>Routine Checkup</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-danger">
-                                            <div class="item-content">
-                                                <div class="text--muted">Thu, 10 Mar</div>
-                                                <p>Routine Checkup</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-info">
-                                            <div class="item-content">
-                                                <div class="text-small">Sat, 5 Mar</div>
-                                                <p>Routine Checkup</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-danger">
-                                            <div class="item-content">
-                                                <div class="text-small">Sun, 11 Feb</div>
-                                                <p>Blood checkup test</p>
-                                            </div>
-                                        </div>
-                                        <div class="timeline-item border-info">
-                                            <div class="item-content">
-                                                <div class="text-small">Thu, 17 Jan</div>
-                                                <p>Admit patient ward no. 21</p>
-                                            </div>
-                                        </div>
+                            <div role="tabpanel" class="tab-pane" id="consultations">
+                                <div class="body">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped">
+                                            <thead>
+                                            <tr>
+                                                
+                                                <th> Doctor Name </th>
+                                                <th> Status </th>
+                                                <th> Date created</th>
+                                                <th>  </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for consultation in consultations %}
+                                            <tr>
+                                                
+                                                <td>{{ consultation.doctor}}</td>
+                                                <td>{{ consultation.status}}</td>
+                                                <td>{{ consultation.created}}</td>
+                                                <td><a href="{% url 'usermanagement:consultation_info' consultation.id %}"><button class="btn btn-primary"> Info </button></a></td>
+                                            </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>

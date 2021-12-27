@@ -1,0 +1,126 @@
+{% extends "usermanagement/base-patient.html" %} 
+{% load static %}
+{% block title %} {{user.username}} {% endblock %} 
+{% block body %}
+    <section class="content profile-page">
+        <div class="container-fluid">
+            <div class="block-header">
+                <h2>Consultation Info</h2>
+                <small class="text-muted">Polyclinic Fultang</small>
+            </div>        
+            <div class="row clearfix">
+                <div class="col-lg-4 col-md-12 col-sm-12">
+                    <div class=" card patient-profile">
+                        {% if patient.user.profile_pic %}
+                        <img src="{{patient.user.profile_pic.url}}" class="img-fluid" alt=""> 
+                        {% else %}    
+                            <img src="{% static 'usermanagement/images/image-1.jpg' %}" class="img-fluid" alt="">                               
+                        {% endif %}                             
+                    </div>
+                    <div class="card">
+                        <div class="header">
+                            <h2>About Patient</h2>
+                        </div>
+                        <div class="body">
+                            <strong>Name</strong>
+                            <p>{{patient.user.first_name}} {{patient.user.last_name}}</p>
+                            <strong>Occupation</strong>
+                            <p>{{patient.user.profession}}</p>
+                            <strong>Email ID</strong>
+                            <p>{{patient.user.email}}</p>
+                            <strong>Phone</strong>
+                            <p>{{patient.user.tel}}</p>
+                            <hr>
+                            <strong>Address</strong>
+                            <address>{{patient.user.address}}</address>
+                            <strong>Admitted</strong>
+                            {% if patient.admitted == False %}
+                            <p> No </p>
+                            {% else %}
+                                <p> Yes </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8 col-md-12 col-sm-12">
+                    <div class="card">
+                        <div class="body"> 
+                            <h4>Observations</h4>
+                            <div class="post-box">
+                                <p> {{ report.observations|linebreaks }} </p>
+                            </div>
+                            <hr>
+                            <h4>References</h4>
+                            <div class="post-box">
+                                <p> {{ report.Ref|linebreaks }} </p>
+                            </div>
+                            <hr>
+                            <h4>Prescriptions</h4>
+                            <div class="post-box">
+                                <p id="prescription"> 
+                                    {{ report.prescriptions|linebreaks }} 
+                                </p>
+                                {% if request.user == consultation.doctor.user %}
+                                <div class="text-right">
+                                    <button class="btn btn-sm btn-primary" onClick="showTextarea('med2','med-btn2',' Modify Prescription')" id="med-btn2"> Modify Prescription </button>
+                                </div>
+                                <form style="display: none;" id="med2" method='post' action="{% url 'usermanagement:modify_prescription' conId %}">
+                                    {% csrf_token %}
+                                    <textarea oninput="prescriptionDisplay()" id="presfield" required rows="8" cols="80" name="prescriptions" placeholder="Medications...">{{report.prescriptions}}</textarea>
+                                    <br>
+                                    <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('med2','med-btn2','Modify Prescription')"> Submit </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            <hr>
+                            <h4>Lab Tests</h4>
+                            <div class="post-box">
+                                <p> {{ lab_tests.tests| linebreaks }} </p>
+                                {% if request.user == consultation.doctor.user or request.user == consultation.patient.user%}
+                                <div class="text-right">
+                                    <button id="result-btn" class="btn btn-sm btn-primary" onClick="showResults()"> Results </button>
+                                </div>
+                                <div id="lab_test_results" style="display: none;">
+                                    {{lab_tests.results| linebreaks }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <hr>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function showTextarea(formid,buttonid,text) {
+            if( document.getElementById(formid).style.display == 'none' ) {
+                document.getElementById(formid).style.display = 'block';
+                document.getElementById(buttonid).innerHTML = 'Close'
+            }else{
+                document.getElementById(formid).style.display = 'none';
+                document.getElementById(buttonid).innerHTML = text
+            }
+            
+        }
+        function hideTextarea(formid,buttonid,text) {
+            document.getElementById(formid).style.display = 'none';
+            document.getElementById(buttonid).innerHTML = text
+        }
+        function prescriptionDisplay() {
+            let x = document.getElementById("presfield").value;
+            document.getElementById("prescription").nextSibling.innerHTML = x;
+            
+        }
+        function showResults() {
+            if( document.getElementById('lab_test_results').style.display == 'none' ) {
+                document.getElementById('lab_test_results').style.display = 'block';
+                document.getElementById('result-btn').innerHTML = 'Close'
+            }else{
+                document.getElementById('lab_test_results').style.display = 'none';
+                document.getElementById('result-btn').innerHTML = 'Results'
+            }
+        }
+        </script>
+{% endblock %}

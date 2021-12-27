@@ -19,5 +19,7 @@ urlpatterns = [
     path('consultation_queue/<consultant>/', consultation_queue, name="consultation_queue"),
     path('delete_consultation/<int:pk>/', ConsultationDeleteView.as_view(), name="consultation_delete"),
     path('add_consultation', add_consultation, name="add_consultation"),
-    path('doctor_report/<int:conId>/' , doctor_report, name="doctor_report")
+    path('doctor_report/<int:conId>/' , doctor_report, name="doctor_report"),
+    path('consultation_info/<int:conId>/', consultation_info, name='consultation_info'),
+    path('modify_prescription/<int:conId>/',modify_prescription, name='modify_prescription')
 ]

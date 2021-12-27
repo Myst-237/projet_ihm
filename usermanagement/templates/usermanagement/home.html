@@ -43,27 +43,6 @@
     <div class="col-12">
         <div class="navbar-header"> <a href="{% url 'usermanagement:home' %}" class="bars"></a> <a class="navbar-brand" href="{% url 'usermanagement:home' %}">Polyclinic Fultang</a> </div>
         <ul class="nav navbar-nav navbar-right">
-            <!-- Notifications -->
-            <li class="dropdown"> <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button"><i class="zmdi zmdi-notifications"></i> <span class="label-count">7</span> </a>
-                <ul class="dropdown-menu">
-                    <li class="header">NOTIFICATIONS</li>
-                    <li class="body">
-                        <ul class="menu">
-                            <li>
-                                <a href="javascript:void(0);">
-                                    <div class="icon-circle bg-light-green"><i class="zmdi zmdi-account-add"></i></div>
-                                    <div class="menu-info">
-                                        <h4>12 new members joined</h4>
-                                        <p><i class="material-icons">access_time</i> 14 mins ago</p>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="footer"> <a href="javascript:void(0);">View All Notifications</a> </li>
-                </ul>
-            </li>
-            <!-- #END# Notifications --> 
             {% include 'usermanagement/roles.html' %}
         </ul>
     </div>
@@ -79,7 +58,7 @@
                 <h3>{{ user.username }}</h3>
                 <ul>
                     <li><a href="#" title="Go to Inbox"><i class="zmdi zmdi-email"></i></a></li>
-                    <li><a href="#" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
+                    <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
                     <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
                 </ul>
             </div>

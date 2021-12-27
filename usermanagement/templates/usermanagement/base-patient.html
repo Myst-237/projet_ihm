@@ -1,7 +1,8 @@
 {% extends "usermanagement/base-executive.html" %} 
 {% block title %} Patient {% endblock %} 
 {% block dashbord %}
-
+    <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}"><i class="zmdi zmdi-account-o"></i><span>Profile</span> </a> </li>
+    <li><a href="{% url 'usermanagement:consultation_queue' 'Patient' %}"><i class="zmdi zmdi-account-o"></i><span>Consultation Queue</span> </a> </li>
 {% endblock %}
 {% block body %}
 

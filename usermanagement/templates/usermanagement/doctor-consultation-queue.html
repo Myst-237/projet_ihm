@@ -42,7 +42,7 @@
                                     <th> Patient Name </th>
                                     <th> Doctor Name </th>
                                     <th> Status </th>
-                                    <th> Date </th>
+                                    <th> Last Modified </th>
                                     <th>  </th>
                                 </tr>
                                 </thead>
@@ -52,9 +52,13 @@
                                     <td>{{ forloop.counter }}</td>
                                     <td>{{ consultation.patient}}</td>
                                     <td>{{ consultation.doctor}}</td>
-                                    <td>{{ consultation.status}}</td>
+                                    <td>
+                                        {% if consultation.status == 'On Hold' %}<span class="label label-danger">{% endif %} 
+                                        {% if consultation.status == 'Pending' %}<span class="label label-info">{% endif %}
+                                        {{ consultation.status}}</span> </td>
+                                   
                                     <td>{{ consultation.modified}}</td>
-                                    <td><a href="{% url 'usermanagement:patient_profile' role='Doctor' patient_name=consultation.patient.user.username %}?conId={{consultation.id}}"><button class="btn btn-primary"> Consult </button></a></td>
+                                    <td><a href="{% url 'usermanagement:patient_profile' role='Doctor' patient_name=consultation.patient.user.username %}?conId={{consultation.id}}"><button class="btn btn-sm btn-primary"> Consult </button></a></td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>
