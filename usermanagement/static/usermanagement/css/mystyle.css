@@ -13,3 +13,11 @@
     position: relative;
     top: 300px;
 }
+
+#obs, #ref, #med, #lab {
+    margin-top: 5px;
+}
+
+.custom-btn-width {
+    width: 180px !important;
+}

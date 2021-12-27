@@ -26,6 +26,12 @@
                         <hr>
                         <strong>Address</strong>
                         <address>{{patient.user.address}}</address>
+                        <strong>Admitted</strong>
+                        {% if patient.admitted == False %}
+                           <p> No </p>
+                        {% else %}
+                            <p> Yes </p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -83,29 +89,89 @@
                                         {% endif %}
                                     </div>
                                     <hr>
+                         {% if consultation %}
                                     <div class="post-box">
-                                        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. </p>
-                                        <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. </p>
-                                    </div>
-                                    <hr>
-                                    <h4>Education</h4>
-                                    <ul class="dis">
-                                        <li>B.Com from Ski University</li>
-                                        <li>In hac habitasse platea dictumst.</li>
-                                        <li>In hac habitasse platea dictumst.</li>
-                                        <li>Vivamus elementum semper nisi.</li>
-                                        <li>Praesent ac sem eget est egestas volutpat.</li>
-                                    </ul>
-                                    <hr>
-                                    <h4>Past Visit History</h4>
-                                    <ul class="dis">
-                                        <li>Integer tincidunt.</li>
-                                        <li>Praesent vestibulum dapibus nibh.</li>
-                                        <li>Integer tincidunt.</li>
-                                        <li>Praesent vestibulum dapibus nibh.</li>
-                                        <li>Integer tincidunt.</li>
-                                        <li>Praesent vestibulum dapibus nibh.</li>
-                                    </ul>
+                                        <h4> Consultation Status: {{consultation.status}} </h4>
+                                    </div> 
+                                        <hr>
+                                        <ul class="dis">
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('obs','obs-btn','Add Observation')" id="obs-btn"> Observations </button>
+                                            <form style="display: none;" id="obs" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                {% csrf_token %}
+                                                <textarea required rows="8" cols="80" name="observations" placeholder="Observations...">{{observations}}</textarea>
+                                                <br>
+                                                <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('obs','obs-btn','Observations')"> Submit </button>
+                                            </form>
+                                        </ul>
+                                        <hr>
+                                        <ul class="dis">
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('ref','ref-btn','Add Reference')" id="ref-btn"> References </button>
+                                            <form style="display: none;" id="ref" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                {% csrf_token %}
+                                                <textarea required rows="8" cols="80" name="references" placeholder="References...">{{references}}</textarea>
+                                                <br>
+                                                <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('ref','ref-btn','References')"> Submit </button>
+                                            </form>
+                                        </ul>
+                                        <hr>
+                                        <ul class="dis">
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('med','med-btn','Prescribe Medication')" id="med-btn">Prescribe Medication </button>
+                                            <form style="display: none;" id="med" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                {% csrf_token %}
+                                                <textarea required rows="8" cols="80" name="prescriptions" placeholder="Medications...">{{prescriptions}}</textarea>
+                                                <br>
+                                                <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('med','med-btn','Prescribe Medication')"> Submit </button>
+                                            </form>
+                                        </ul>
+                                        <hr>
+                                        <ul class="dis">
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('lab','lab-btn','Laboratory Tests')" id="lab-btn">Laboratory Tests </button>
+                                            <form style="display: none;" id="lab" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                {% csrf_token %}
+                                                <textarea required rows="8" cols="80" name="lab_tests" placeholder="Lab Tests...">{{lab_tests}}</textarea>
+                                                <br>
+                                                <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('lab','lab-btn','Laboratory Tests')"> Submit </button>
+                                            </form>
+                                        </ul>
+                                        
+                                        {% if patient.admitted == False %}
+                                        <hr>
+                                        <ul class="dis">
+                                            <p> Admit Patient </p>
+                                            <form id="adm" class="form-check form-check-inline" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                {% csrf_token %}
+                                                <input required type="radio" id="radio1" name="admit" value="Yes">
+                                                <label for="radio1"> Yes </label><br>
+                                                <input type="radio" id="radio2" name="admit" value="No">
+                                                <label for="radio2"> No </label><br>
+                                                <button type="submit" class="btn btn-sm btn-success ml-3" > Submit </button>
+                                            </form>
+                                        </ul>
+                                        {% endif %}
+                                        <hr>
+                                        <ul class="dis">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <form id="adm" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="complete_consultation" value="Done">
+                                                        <div class="text-center">
+                                                            <button type="submit" class="btn btn-sm btn-secondary" > Complete Consultation </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-6">
+                                                    <form id="adm" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="hold_consultation" value="Hold">
+                                                        <div class="text-center">
+                                                            <button type="submit" class="btn btn-sm btn-danger ml-4" > Hold Consultation </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </ul>
+                        {% endif %}
                                 </div>
                             </div>
                             </div>
@@ -170,3 +236,21 @@
         </div>
     </div>
 </section>
+
+
+<script>
+function showTextarea(formid,buttonid,text) {
+    if( document.getElementById(formid).style.display == 'none' ) {
+        document.getElementById(formid).style.display = 'block';
+        document.getElementById(buttonid).innerHTML = 'Close'
+    }else{
+        document.getElementById(formid).style.display = 'none';
+        document.getElementById(buttonid).innerHTML = text
+    }
+    
+}
+function hideTextarea(formid,buttonid,text) {
+    document.getElementById(formid).style.display = 'none';
+    document.getElementById(buttonid).innerHTML = text
+}
+</script>

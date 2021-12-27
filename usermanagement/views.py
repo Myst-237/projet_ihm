@@ -2,14 +2,14 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from .models import CustomUser, Receptionist, Patient, Doctor, PatientVitalCard, Consultation
+from .models import *
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 
 
 #ALL FUNCTION BASED VIEWS
 
-#function to verify if a user has the write to access the patient profile    
+#function to verify if a user has the right to access the patient profile    
 def has_patient_profile_permission(request, patient_name):
         if 'Doctor' or 'Receptionist' or 'Admin' in request.user.role:
             return True
@@ -61,6 +61,7 @@ def receptionist(request):
             patient = Patient.objects.get(user = user)
             messages.info(request, "This patient already exists")
             return redirect("usermanagement:receptionist")
+        #if not,  create a new patient
         except ObjectDoesNotExist:
             Patient.objects.create(
                 user = user,
@@ -88,47 +89,58 @@ def receptionist(request):
     }
     return render(request, 'usermanagement/receptionist.html',context)
 
-#consultation view 
+
+#function that handles registering consultations
 def consultation(request):
     if request.method == 'POST':
+        #get the selected patient and doctor from the consultation form
         selected_patient = request.POST.get('selected_patient')
         selected_doctor = request.POST.get('selected_doctor')
         patient = Patient.objects.get(user=CustomUser.objects.get(username=selected_patient))
         doctor = Doctor.objects.get(user=CustomUser.objects.get(username=selected_doctor))
+        #verify if the patient has an on going consultation, before creating a new one
         try:
-            consultation = Consultation.objects.get(patient=patient)
+            consultation = Consultation.objects.filter(patient=patient)[0]
             if consultation.status == "Pending":
                 messages.info(request, f"{patient} has a Pending consultation appointment with {consultation.doctor.user.username}")
-                return redirect("usermanagement:receptionist")
+                return redirect("usermanagement:add_consultation")
             if consultation.status == "On Hold":
                 messages.info(request, f"{patient}'s consultation appointment is still On Hold")
-                return redirect("usermanagement:receptionist")
-            if consultation.status == "Finished":
+                return redirect("usermanagement:add_consultation")
+            #if the consultation is complete, create a new consultation
+            if consultation.status == "Complete":
                 Consultation.objects.create(
                 patient = patient,
                 doctor = doctor,
                 status = 'Pending'
                 )
+        #if there isn't any on going consultation, create a new consultation
         except ObjectDoesNotExist:
             Consultation.objects.create(
                 patient = patient,
                 doctor = doctor,
                 status = 'Pending'
                 )
+    #return to the consultation queue to see that the created consultation has been added to queue
     messages.info(request, "Consultation appointment succefully added to queue")  
     return redirect("usermanagement:consultation_queue", consultant='Receptionist')
 
 
-#receptionist view for searching all patients
+#receptionist view for all patients
 @login_required
 def all_patients(request, role):
     context = {
-        'patients': Patient.objects.all().order_by('-created')
+        'patients': Patient.objects.all().order_by('-created'),
+        'role': role
     }
     
     #verify if the reqeust is sent by a Receptionist and load the receptionist dashboard
     if role == 'Receptionist':
         return render(request, 'usermanagement/receptionist-all-patients.html',context)
+    #verify if the request is sent by a Doctor and load the doctor's dashboard
+    if role == 'Doctor':
+        return render(request, 'usermanagement/doctor-all-patients.html', context)
+    #generically return the base all_patients templates 
     return render(request, 'usermanagement/all-patients.html',context)
     
 
@@ -137,41 +149,71 @@ def patient_profile(request,role, patient_name):
     
     #verify if the request has permissions to the profile page of the user and hence give access to the request
     if(has_patient_profile_permission(request, patient_name)):
+        
+        #then get the context data ie: patient, vitals, contultation etc
         try:
             patient = Patient.objects.get(user = CustomUser.objects.get(username = patient_name))
         except ObjectDoesNotExist:
             messages.info(request, "Patient does not exist")
             return redirect('/home')
+        
         try:
             vitals = PatientVitalCard.objects.filter(patient = patient).latest('created') 
         except ObjectDoesNotExist:
             vitals = None
+        
+        try:
+            consultation = Consultation.objects.get(id=int(request.GET.get('conId')))
+        except ObjectDoesNotExist:
+            messages.info(request, "Consultation number is invalid")
+            return redirect("usermanagement:doctor")
+        except TypeError:
+            consultation = None
+        
         context = {
             'patient': patient,
-            'vitals': vitals
+            'vitals': vitals,
+            'conId': request.GET.get('conId'),
+            'consultation': consultation,
+            'role': role
         }
+        #use the role to determine read/write access to the patient profile
         if role == 'Receptionist':
             return render(request, 'usermanagement/receptionist-patient-profile.html',context)
         elif role == 'Doctor':
+            if Consultation is not None:
+                try:
+                    Report = DoctorReport.objects.get(consultation=consultation)
+                    context['observations'] = Report.observations
+                    context['references'] = Report.Ref
+                    context['prescriptions'] = Report.prescriptions
+                    context['lab_tests'] = LabTest.objects.get(consultation=consultation).tests
+                except ObjectDoesNotExist:
+                    pass
             return render(request, 'usermanagement/doctor-patient-profile.html',context)
+        #if the request is sent by the owner of the profile
         elif request.user.username == patient_name:
             return render(request, 'usermanagement/patient.html',context)
         else:
             messages.info(request, "You do not have the permissons to acces this profile page")
             return redirect('/home')
-
+    
+    #if the request does not have access to the patient profile, prompt the client to register to gain access
     else:
         messages.info(request, "Please register as a patient to access this interface")
         return redirect('/home')
     
+    
 #nurse functionality
 @login_required
 def nurse(request):
+    #get context data
     context = {
         'all_patients': Patient.objects.all(),
     }
     
     if request.method == 'POST':
+        #if the post request is to register patient vitals, get patient vitals from registration form
         selected_patient = request.POST.get('selected_patient')
         temperature = request.POST.get('temperature')
         pulse = request.POST.get('pulse')
@@ -180,7 +222,9 @@ def nurse(request):
         blood_pressure = request.POST.get('blood_pressure')
         weight = request.POST.get('weight')
         
+
         try:
+            #create the patient vital card
             patient = Patient.objects.get(user = CustomUser.objects.get(username = selected_patient))
             PatientVitalCard.objects.create(
             patient = patient,
@@ -199,24 +243,39 @@ def nurse(request):
         
     return render(request, 'usermanagement/nurse.html', context)
 
+
 #consultation queue 
+#the consultation queue is the list of on going consultations which is filtered with respect to the client making the request
 def consultation_queue(request, consultant):
+    
+    #if the client is a receptionist
     if consultant == 'Receptionist':
-        consultaions = Consultation.objects.all()
+        consultations = Consultation.objects.all()
+        consultation_list = []
+        for consultation in consultations:
+            if consultation.status == 'Pending' or consultation.status == 'On Hold':
+                consultation_list.append(consultation)
         context = {
-        'consultations': consultaions,
+        'consultations': consultation_list,
         'consultant': consultant
         } 
         return render(request, 'usermanagement/general-consultation-queue.html', context)
     
+    #if the client is a doctor
     if consultant == 'Doctor':
-        consultaions = Consultation.objects.filter(doctor=Doctor.objects.get(user=request.user))
+        consultations = Consultation.objects.filter(doctor=Doctor.objects.get(user=request.user))
+        consultation_list = []
+        for consultation in consultations:
+            if consultation.status == 'Pending' or consultation.status == 'On Hold':
+                consultation_list.append(consultation)
         context = {
-        'consultations': consultaions,
+        'consultations': consultation_list,
         'consultant': consultant
         } 
         return render(request, 'usermanagement/doctor-consultation-queue.html', context)
+    
 
+#function to obtain context data for adding a consultation
 def add_consultation(request):
     context = {
         'all_users': [user.username for user in CustomUser.objects.all()],
@@ -226,54 +285,69 @@ def add_consultation(request):
     return render(request, 'usermanagement/add-consultation.html',context)
 
 
+#doctor report after consultation
+def doctor_report(request, conId):
+    
+    consultation = Consultation.objects.get(id=conId)
+    patient = consultation.patient
+    try:
+        Report = DoctorReport.objects.get(consultation = consultation)
+    except ObjectDoesNotExist:
+        Report = DoctorReport.objects.create(
+            consultation = consultation
+        )
+    
+    try:
+        Lab_Test = LabTest.objects.get(consultation = consultation)
+    except ObjectDoesNotExist:
+        Lab_Test = LabTest.objects.create(
+            consultation = consultation
+        )
+
+    if request.method == 'POST':
+        #logic handling the submit request to each option in the doctor report view
+        observations = request.POST.get('observations')
+        if observations is not None:
+            Report.observations = observations
+            Report.save()
+        ref = request.POST.get('references')
+        if ref is not None:
+            Report.Ref = ref
+            Report.save()
+        prescriptions = request.POST.get('prescriptions')
+        if prescriptions is not None:
+            Report.prescriptions = prescriptions
+            Report.save()
+        lab_tests = request.POST.get('lab_tests')
+        if lab_tests is not None:
+            Lab_Test.tests = lab_tests
+            Lab_Test.save()
+        admitted = request.POST.get('admit')
+        if admitted is not None:
+            if admitted == 'Yes':
+                Report.admitted  = True
+                Report.save()
+                patient.admitted = True
+                patient.save()
+            if admitted == 'No':
+                Report.admitted  = False
+                Report.save()
+                patient.admitted = False
+                patient.save()
+        complete_consultation = request.POST.get('complete_consultation')
+        if complete_consultation is not None:
+            consultation.status = 'Complete'
+            consultation.save()
+            return redirect('/doctor')
+        hold_consultation = request.POST.get('hold_consultation')
+        if hold_consultation is not None:
+            consultation.status = 'On Hold'
+            consultation.save()
+            return redirect('/doctor')
+        
+    return redirect('/Doctor/profile/'+consultation.patient.user.username+'/?conId='+str(consultation.id))
 
 
-
-# ALL CLASS BASED VIEWS
-
-#consultation delete view
-class ConsultationDeleteView(DeleteView):
-    model = Consultation
-    success_url = reverse_lazy('usermanagement:consultation_queue', kwargs = {'consultant': 'Receptionist'})
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 #doctor functionality
 @login_required
 def doctor(request):
@@ -302,6 +376,16 @@ def payments(request):
 @login_required
 def patient(request):
         return render(request, 'usermanagement/patient.html')
+
+
+
+# ALL CLASS BASED VIEWS
+
+#consultation delete view
+class ConsultationDeleteView(DeleteView):
+    model = Consultation
+    success_url = reverse_lazy('usermanagement:consultation_queue', kwargs = {'consultant': 'Receptionist'})
+
     
 
 

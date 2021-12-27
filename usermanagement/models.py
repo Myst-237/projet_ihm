@@ -34,7 +34,7 @@ Gender = [
 
 Status = [
     ('Pending', 'Pending'),
-    ('Finished', 'Finished'),
+    ('Complete', 'Complete'),
     ('On Hold', 'On Hold'),
 ]
 #the custom user model that extends the django base user model adding the required attributes
@@ -77,6 +77,7 @@ class Patient(models.Model):
     person_to_contact_tel = models.CharField(max_length=100)
     age  = models.CharField(max_length=10, blank = True, null = True)
     gender = models.CharField(max_length=10, blank = True, null = True, choices = Gender)
+    admitted = models.BooleanField(default=False)
     created = models.DateTimeField(editable=False)
     modified = models.DateTimeField()
 
@@ -106,30 +107,51 @@ class LabTech(models.Model):
     
     def __str__(self):
         return self.user.username
+
+#Consultation queue
+class Consultation(models.Model):
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices = Status)
+    created = models.DateTimeField()
+    modified = models.DateTimeField()
+    
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Consultation, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.doctor.user.username} / {self.patient.user.username} consultation"
         
 #labtest model
 class LabTest(models.Model):
-    doctor = models.ForeignKey(Doctor, on_delete= models.CASCADE)
-    patient = models.ForeignKey(Patient, on_delete = models.CASCADE)
+    consultation = models.ForeignKey(Consultation, on_delete = models.CASCADE)
     created = models.DateField()
     modified = models.DateField()
-    tests = models.TextField()
-    results = models.TextField()
-    remarks = models.TextField()
+    tests = models.TextField(null=True, blank=True)
+    results = models.TextField(null=True, blank= True)
+    remarks = models.TextField(null=True, blank= True)
     
     def __str__(self):
-        return f"{self.patient.username}'s Lab test"
-    
+        return f"{self.consultation.patient.user.username}'s Lab test"
+
+    def save(self, *args, **kwargs):
+        ''' On save, update timestamps '''
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(LabTest, self).save(*args, **kwargs)
 
 #doctor report after patient consultation    
 class DoctorReport(models.Model):
-    doctor = models.ForeignKey(Doctor, on_delete = models.CASCADE)
-    patient = models.ForeignKey(Patient, on_delete = models.CASCADE)
-    notes = models.TextField(blank=True, null=True)
+    consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
+    observations = models.TextField(blank=True, null=True)
+    Ref = models.TextField(blank=True, null=True)
     prescriptions = models.TextField(blank = True, null = True)
-    lab_tests = models.ForeignKey(LabTest, on_delete = models.CASCADE)
     admitted = models.BooleanField(default = False)
-    remarks = models.TextField(blank = True, null = True)
     created = models.DateTimeField()
     modified = models.DateTimeField()
     
@@ -141,7 +163,7 @@ class DoctorReport(models.Model):
         return super(DoctorReport, self).save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.patient.username}'s Report by {self.doctor.username}"    
+        return f"{self.consultation.patient.user.username}'s Report by {self.consultation.doctor.user.username}"    
     
     
 #patient vital signs before consultation    
@@ -166,23 +188,6 @@ class PatientVitalCard(models.Model):
     def __str__(self):
         return f"Vitals for {self.patient.user.username} <{self.created}> "
     
-#Consultation queue
-class Consultation(models.Model):
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices = Status)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
-    
-    def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
-        if not self.id:
-            self.created = timezone.now()
-        self.modified = timezone.now()
-        return super(Consultation, self).save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.doctor.user.username} / {self.patient.user.username} consultation"
     
 #Receptionist for patient Registration 
 class Receptionist(models.Model):

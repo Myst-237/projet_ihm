@@ -1,13 +1,8 @@
 {% extends "usermanagement/base-executive.html" %} 
 {% block title %} Doctor {% endblock %} 
-{% block dashbord %}
-<!-- Menu -->
-        <div class="menu">
-            <ul class="list">
-                <li class="header">MAIN NAVIGATION</li>
-                <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li>                                               
+{% block dashbord %}  
                 <li><a href="{% url 'usermanagement:consultation_queue' 'Doctor' %}"><i class="zmdi zmdi-account-o"></i><span>Consultations</span> </a> </li>
-                
+                <li><a href="{% url 'usermanagement:all_patients' role='Doctor' %}"><i class="zmdi zmdi-account-o"></i><span>All Patients</span> </a> </li>                                    
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-balance-wallet"></i><span>Payments</span> </a>
                     <ul class="ml-menu">
                         <li> <a href="{% url 'usermanagement:add_payment' %}">Add Payment</a></li>
@@ -15,9 +10,6 @@
                         <li> <a href="{% url 'usermanagement:payments' %}">Payments</a></li>
                     </ul>
                 </li>
-            </ul>
-        </div>
-        <!-- #Menu -->
 {% endblock %}
 {% block body %}
 

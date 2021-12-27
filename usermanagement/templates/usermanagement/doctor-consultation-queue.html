@@ -54,7 +54,7 @@
                                     <td>{{ consultation.doctor}}</td>
                                     <td>{{ consultation.status}}</td>
                                     <td>{{ consultation.modified}}</td>
-                                    <td><a href="{% url 'usermanagement:patient_profile' role='Doctor' patient_name=consultation.patient.user.username %}"><button class="btn btn-primary"> Consult </button></a></td>
+                                    <td><a href="{% url 'usermanagement:patient_profile' role='Doctor' patient_name=consultation.patient.user.username %}?conId={{consultation.id}}"><button class="btn btn-primary"> Consult </button></a></td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

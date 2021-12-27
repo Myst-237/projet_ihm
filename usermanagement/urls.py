@@ -18,5 +18,6 @@ urlpatterns = [
     path('doctor/', doctor , name="doctor"),
     path('consultation_queue/<consultant>/', consultation_queue, name="consultation_queue"),
     path('delete_consultation/<int:pk>/', ConsultationDeleteView.as_view(), name="consultation_delete"),
-    path('add_consultation', add_consultation, name="add_consultation")
+    path('add_consultation', add_consultation, name="add_consultation"),
+    path('doctor_report/<int:conId>/' , doctor_report, name="doctor_report")
 ]

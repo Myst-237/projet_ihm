@@ -107,11 +107,21 @@
             </div>
         </div>
         <!-- #User Info --> 
+       
+        
         <!-- Menu -->
-        {% block dashbord %}
-            
-        {% endblock %}
+        <div class="menu">
+            <ul class="list">
+                <li class="header">MAIN NAVIGATION</li>
+                <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li> 
+                {% block dashbord %}
+
+                {% endblock %}
+            </ul>
+        </div>
         <!-- #Menu -->
+        
+        
     </aside>
 </section>
 {% block body %}
