@@ -6,7 +6,7 @@ from .models import *
 from django.views.generic.edit import DeleteView
 from django.urls import reverse_lazy
 from django.template import RequestContext
-
+from django.db.models import Q
 
 #ALL FUNCTION BASED VIEWS
 
@@ -38,7 +38,7 @@ def search(request):
     if request.method == 'POST':
         search = request.POST.get('search')
         if search is not None:
-            users = CustomUser.objects.filter(username__icontains=search, first_name__icontains=search, last_name__icontains=search)
+            users = CustomUser.objects.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search))
             if len(users) > 0:
                 for user in users:
                     try:
