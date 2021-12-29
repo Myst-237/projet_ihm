@@ -53,14 +53,26 @@
     <aside id="leftsidebar" class="sidebar"> 
         <!-- User Info -->
         <div class="user-info">
-            <div class="admin-image"> <img src="{% static 'usermanagement/images/random-avatar7.jpg' %}" alt=""> </div>
+            {% if user.profile_pic %}
+                <div class="admin-image"> <img src="{{user.profile_pic.url}}" alt=""> </div>
+            {% else %}
+                <div class="admin-image"> <img src="{% static 'usermanagement/images/random-avatar7.jpg' %}" alt=""> </div>
+            {% endif %}
             <div class="admin-action-info"> <span>Welcome</span>
-                <h3>{{ user.username }}</h3>
+                <h3>{{ user.username|capfirst }}</h3>
                 <ul>
-                    <li><a href="#" title="Go to Inbox"><i class="zmdi zmdi-email"></i></a></li>
-                    <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
+                    <li><span style="color:white"> Sign Out </span></li>
                     <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
                 </ul>
+            </div>
+            <div class="quick-stats">
+                <h5> Please Select a Role </h5>
+                <h5> From the Work As Menu </h5>
+                {% comment %} <ul>
+                    <li><span>16<i>Patient</i></span></li>
+                    <li><span>20<i>Panding</i></span></li>
+                    <li><span>04<i>Visit</i></span></li>
+                </ul> {% endcomment %}
             </div>
         </div>
         <!-- #User Info --> 

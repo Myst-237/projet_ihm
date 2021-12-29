@@ -10,6 +10,7 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = CustomUser
     list_display = ['username', 'email', 'is_staff']
+    readonly_fields = ['role']
     fieldsets = (
         *UserAdmin.fieldsets,
         (
@@ -21,17 +22,34 @@ class CustomUserAdmin(UserAdmin):
                     'address',
                     'date_of_birth',
                     'profession', 
-                    'profile_pic'
+                    'profile_pic',
+                    'active_role'
                 )
             }
         )
     )
-    
+
+class PatientAdmin(admin.ModelAdmin):
+   readonly_fields = ['admitted', 'created', 'modified']
+   
+class PatientVitalCardAdmin(admin.ModelAdmin):
+    readonly_fields = ['created', 'modified']
+
+class DoctorReportAdmin(admin.ModelAdmin):
+    readonly_fields = ['created', 'modified']
+
+class LabTestAdmin(admin.ModelAdmin):
+    readonly_fields = ['created', 'modified']
+
+class ConsultationAdmin(admin.ModelAdmin):
+    readonly_fields = ['created', 'modified']
+
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Receptionist)
-admin.site.register(Patient)
+admin.site.register(Patient, PatientAdmin)
 admin.site.register(Doctor)
-admin.site.register(PatientVitalCard)
-admin.site.register(Consultation)
-admin.site.register(DoctorReport)
-admin.site.register(LabTest)
+admin.site.register(PatientVitalCard, PatientVitalCardAdmin)
+admin.site.register(Consultation, ConsultationAdmin)
+admin.site.register(DoctorReport, DoctorReportAdmin)
+admin.site.register(LabTest, LabTestAdmin)
+admin.site.register(Nurse)

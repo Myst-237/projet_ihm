@@ -3,6 +3,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 #importing the user model from settings
 User = settings.AUTH_USER_MODEL
@@ -39,12 +41,13 @@ Status = [
 ]
 #the custom user model that extends the django base user model adding the required attributes
 class CustomUser(AbstractUser):
-    role = ArrayField(models.CharField(max_length = 50, choices = Roles), default = list)
+    role = ArrayField(models.CharField(max_length = 50, choices = Roles), default = list, null=True, blank= True)
     tel = models.CharField(max_length=30, blank=True, null=True)
     address = models.CharField(max_length=250, blank = True, null = True)
     date_of_birth = models.DateField(blank = True, null = True)
     profession = models.CharField(max_length=100, blank = True, null = True)
     profile_pic = models.ImageField(blank = True, null = True)
+    active_role = models.CharField(max_length=50, blank = True, null = True)
     
     
     def __str__(self):
@@ -75,11 +78,11 @@ class Patient(models.Model):
     place_of_birth = models.CharField(max_length=200)
     person_to_contact = models.CharField(max_length=100)
     person_to_contact_tel = models.CharField(max_length=100)
-    age  = models.CharField(max_length=10, blank = True, null = True)
-    gender = models.CharField(max_length=10, blank = True, null = True, choices = Gender)
+    age  = models.CharField(max_length=10)
+    gender = models.CharField(max_length=10, choices = Gender)
     admitted = models.BooleanField(default=False)
-    created = models.DateTimeField(editable=False)
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -90,6 +93,20 @@ class Patient(models.Model):
     def __str__(self):
         return self.user.username
     
+    def save(self, *args, **kwargs):
+        if 'Patient' in self.user.role:
+            pass
+        else:
+            self.user.role.append('Patient')
+            self.user.save()
+        return super(Patient, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if 'Patient' in self.user.role:
+            self.user.role.remove('Patient')
+            self.user.save()
+        super(Patient, self).delete()
+        
     
  #doctor model   
 class Doctor(models.Model):
@@ -99,6 +116,20 @@ class Doctor(models.Model):
     
     def __str__(self):
         return self.user.username
+    
+    def save(self, *args, **kwargs):
+        if 'Doctor' in self.user.role:
+            pass
+        else:
+            self.user.role.append('Doctor')
+            self.user.save()
+        return super(Doctor, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if 'Doctor' in self.user.role:
+            self.user.role.remove('Doctor')
+            self.user.save()
+        super(Doctor, self).delete()
 
 
 #lab technician model
@@ -113,11 +144,10 @@ class Consultation(models.Model):
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices = Status)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
@@ -129,8 +159,8 @@ class Consultation(models.Model):
 #labtest model
 class LabTest(models.Model):
     consultation = models.ForeignKey(Consultation, on_delete = models.CASCADE)
-    created = models.DateField()
-    modified = models.DateField()
+    created = models.DateField(auto_now_add=True)
+    modified = models.DateField(auto_now=True)
     tests = models.TextField(null=True, blank=True)
     results = models.TextField(null=True, blank= True)
     remarks = models.TextField(null=True, blank= True)
@@ -139,7 +169,6 @@ class LabTest(models.Model):
         return f"{self.consultation.patient.user.username}'s Lab test"
 
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
@@ -152,11 +181,10 @@ class DoctorReport(models.Model):
     Ref = models.TextField(blank=True, null=True)
     prescriptions = models.TextField(blank = True, null = True)
     admitted = models.BooleanField(default = False)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
@@ -175,11 +203,10 @@ class PatientVitalCard(models.Model):
     blood_pressure = models.CharField(max_length=100)
     oxygen_saturation = models.CharField(max_length=200, null=True, blank=True)
     weight = models.CharField(max_length=100)
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     
     def save(self, *args, **kwargs):
-        ''' On save, update timestamps '''
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
@@ -193,13 +220,71 @@ class PatientVitalCard(models.Model):
 class Receptionist(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     
+    def __str__(self):
+        return f"{self.user.username}"
+    
+    def save(self, *args, **kwargs):
+        if 'Receptionist' in self.user.role:
+            pass
+        else:
+            self.user.role.append('Receptionist')
+            self.user.save()
+        return super(Receptionist, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if 'Receptionist' in self.user.role:
+            self.user.role.remove('Receptionist')
+            self.user.save()
+        super(Receptionist, self).delete()
+    
 
 #Nurse: taking vital signs, etc.
 class Nurse(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
     
+    def save(self, *args, **kwargs):
+        if 'Nurse' in self.user.role:
+            pass
+        else:
+            self.user.role.append('Nurse')
+            self.user.save()
+        return super(Nurse, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        if 'Nurse' in self.user.role:
+            self.user.role.remove('Nurse')
+            self.user.save()
+        super(Nurse, self).delete()
+    
+    def __str__(self):
+        return f"{self.user.username}"
     
     
+
+#HOOKS
+@receiver(pre_delete, sender=Patient)
+def delete_patient_role_hook(sender, instance, using, **kwargs): 
+    if 'Patient' in instance.user.role:
+            instance.user.role.remove('Patient')
+            instance.user.save()  
+
+@receiver(pre_delete, sender=Doctor)
+def delete_doctor_role_hook(sender, instance, using, **kwargs): 
+    if 'Doctor' in instance.user.role:
+            instance.user.role.remove('Doctor')
+            instance.user.save()  
+            
+@receiver(pre_delete, sender=Receptionist)
+def delete_receptionist_role_hook(sender, instance, using, **kwargs): 
+    if 'Receptionist' in instance.user.role:
+            instance.user.role.remove('Receptionist')
+            instance.user.save()  
+            
+@receiver(pre_delete, sender=Nurse)
+def delete_nurse_role_hook(sender, instance, using, **kwargs): 
+    if 'Nurse' in instance.user.role:
+            instance.user.role.remove('Nurse')
+            instance.user.save()  
     
     
     

@@ -12,12 +12,57 @@ from django.template import RequestContext
 
 #function to verify if a user has the right to access the patient profile    
 def has_patient_profile_permission(request, patient_name):
-        if 'Doctor' or 'Receptionist' or 'Admin' in request.user.role:
+        if 'Doctor' or 'Receptionist' or 'Admin' or 'Nurse' in request.user.role:
             return True
         elif (request.user.username == patient_name):
             return True
         else:
             return False
+        
+        
+        
+def return_to_home_page(request, role, patient_name):
+    if role == 'Doctor':
+        return redirect('usermanagement:doctor')
+    if role == 'Receptionist':
+        return redirect('usermanagement:receptionist')
+    if role == 'Nurse':
+        return redirect('usermanagement:nurse')
+    if role == 'Patient':
+        return redirect('usermanagement:patient_profile', role=role, patient_name=patient_name)
+    
+        
+def search(request):
+    patients = []
+    role = request.GET.get('role')
+    if request.method == 'POST':
+        search = request.POST.get('search')
+        if search is not None:
+            users = CustomUser.objects.filter(username__icontains=search, first_name__icontains=search, last_name__icontains=search)
+            if len(users) > 0:
+                for user in users:
+                    try:
+                        patients.append(Patient.objects.get(user=user))
+                    except ObjectDoesNotExist:
+                        pass
+                if len(patients) == 0:
+                        messages.info(request, "Patient with Name '"+ search + "' does not exist")
+                        return return_to_home_page(request, role, 'None')
+                else:
+                    context = {'patients': patients,
+                               'role': role}
+                    return render(request, 'usermanagement/'+role.lower()+'-all-patients.html',context)
+                    
+            else:
+                messages.info(request, "Patient with Name '"+ search + "' does not exist")
+                return return_to_home_page(request, role, 'None')
+        else:
+            messages.info(request, "Please enter a keyword to search")
+            return return_to_home_page(request, role)
+    
+    messages.info(request, "Please enter a keyword to search")
+    return return_to_home_page(request, role, 'None')
+            
 
 #view logic
 
@@ -44,6 +89,8 @@ def handler500(request, *args, **argv):
 #the receptionist view
 @login_required
 def receptionist(request):
+    request.user.active_role = 'Receptionist'
+    request.user.save()
     
     #logic for post requests
     if request.method == 'POST':
@@ -152,12 +199,17 @@ def all_patients(request, role):
     #verify if the request is sent by a Doctor and load the doctor's dashboard
     if role == 'Doctor':
         return render(request, 'usermanagement/doctor-all-patients.html', context)
+    #verify if the request is sent by a Nurse and load the nurse's Dashboard
+    if role == 'Nurse':
+        return render(request, 'usermanagement/nurse-all-patients.html', context)
     #generically return the base all_patients templates 
     return render(request, 'usermanagement/all-patients.html',context)
     
 
 #patient profile view
 def patient_profile(request,role, patient_name):
+    request.user.active_role = role
+    request.user.save()
     
     #verify if the request has permissions to the profile page of the user and hence give access to the request
     if(has_patient_profile_permission(request, patient_name)):
@@ -167,7 +219,7 @@ def patient_profile(request,role, patient_name):
             patient = Patient.objects.get(user = CustomUser.objects.get(username = patient_name))
         except ObjectDoesNotExist:
             messages.info(request, "Patient does not exist")
-            return redirect('/home')
+            return return_to_home_page(request, role, patient_name)
         
         try:
             vitals = PatientVitalCard.objects.filter(patient = patient).latest('created') 
@@ -207,19 +259,23 @@ def patient_profile(request,role, patient_name):
         #if the request is sent by the owner of the profile
         elif request.user.username == patient_name:
             return render(request, 'usermanagement/patient.html',context)
+        elif role == 'Nurse':
+            return render(request, 'usermanagement/nurse-patient-profile.html',context)
         else:
             messages.info(request, "You do not have the permissons to acces this profile page")
-            return redirect('/home')
+            return return_to_home_page(request, role, patient_name)
     
     #if the request does not have access to the patient profile, prompt the client to register to gain access
     else:
         messages.info(request, "Please register as a patient to access this interface")
-        return redirect('/home')
+        return return_to_home_page(request, role, patient_name)
     
     
 #nurse functionality
 @login_required
 def nurse(request):
+    request.user.active_role = 'Nurse'
+    request.user.save()
     #get context data
     context = {
         'all_patients': Patient.objects.all(),
@@ -413,7 +469,7 @@ def modify_prescription(request, conId):
         Report = DoctorReport.objects.get(consultation = consultation)
     except ObjectDoesNotExist:
         messages.info(request, "No such Report")
-        return redirect('/home')
+        return return_to_home_page(request, 'Doctor', 'None')
     
     prescriptions = request.POST.get('prescriptions')
     if prescriptions is not None:
@@ -425,7 +481,9 @@ def modify_prescription(request, conId):
 #doctor functionality
 @login_required
 def doctor(request):
-        return redirect('usermanagement:consultation_queue', consultant = 'Doctor')
+    request.user.active_role = 'Doctor'
+    request.user.save()
+    return redirect('usermanagement:consultation_queue', consultant = 'Doctor')
 #functionality for booking appointments
 @login_required
 def book_appointment(request):
@@ -449,7 +507,8 @@ def payments(request):
     
 @login_required
 def patient(request):
-        return render(request, 'usermanagement/patient.html')
+    request.user.active_role = 'Patient'
+    return render(request, 'usermanagement/patient.html')
 
 
 
