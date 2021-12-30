@@ -50,7 +50,7 @@
                                     {% for consultation in consultations %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td>{{ consultation.patient}}</td>
+                                    <th> <a  href="{% url 'usermanagement:patient_profile' role=active_role patient_name=consultation.patient.user.username %}">  <span style="color:black;"> {{ consultation.patient}} </span> </a> </th>
                                     <td>{{ consultation.doctor}}</td>
                                     <td>
                                         {% if consultation.status == 'On Hold' %}<span class="label label-danger">{% endif %} 

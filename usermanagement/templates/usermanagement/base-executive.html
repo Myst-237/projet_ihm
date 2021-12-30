@@ -76,8 +76,9 @@
             <div class="admin-action-info"> <span>Welcome</span>
                 <h3>{{ user.username|capfirst }}</h3>
                 <ul>
-                    <li><a href="#" title="Go to Inbox"><i class="zmdi zmdi-email"></i></a></li>
+                    {% if is_patient %}
                     <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
+                    {% endif %}
                     <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
                 </ul>
             </div>

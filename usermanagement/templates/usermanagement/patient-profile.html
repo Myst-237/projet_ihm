@@ -200,7 +200,9 @@
                                                 <td>{{ consultation.doctor}}</td>
                                                 <td>{{ consultation.status}}</td>
                                                 <td>{{ consultation.created}}</td>
+                                                {% if consultation.status == 'Complete' %}
                                                 <td><a href="{% url 'usermanagement:consultation_info' consultation.id %}"><button class="btn btn-primary"> Info </button></a></td>
+                                                {% endif %}
                                             </tr>
                                             {% endfor %}
                                             </tbody>
