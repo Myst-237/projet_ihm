@@ -1,0 +1,161 @@
+﻿{% extends "usermanagement/base-receptionist.html" %} 
+{% block title %} Reception {% endblock %} 
+
+{% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="block-header">
+      <h2>Payment</h2>
+      <small class="text-muted">Polyclinic Fultang</small>
+    </div>
+    {% if messages %}
+            <div>
+                <ul>
+                {% for message in messages %}
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                        <strong>{{message}}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                </div>
+                {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    <div class="row clearfix">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="card">
+          <div class="header">
+            <h2>Select Patient<small>Patient Payment Form...</small></h2>
+          </div>
+            <form method="post" action="{% url 'usermanagement:payment' %}">
+                {% csrf_token %}
+                <div class="body">
+                    <div class="row clearfix">
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="form-group">
+                            <div class="form-line">
+                                <input type="text" class="form-control" placeholder="Search Patient..." id="userInput" onkeyup="Func()"/>
+                            </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-12">
+                            <div class="form-group drop-custum" id="Dropdown">
+                            <select class="form-control show-tick" name="selected_patient" required>
+                                <option value="">-- Username --</option>
+                                {% for patient in all_patients %}
+                                <option value="{{patient}}"> {{patient}} </option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                        </div>
+                    </div>   
+                    <div class="row clearfix">
+                        <div class="pl-3">
+                          <button type="submit" class="btn btn-raised g-bg-cyan ">
+                            OK
+                          </button>
+                        </div>
+                      </div>     
+                </div>
+            </form>
+        </div>
+      </div>
+    </div>
+    {% if bill_book is not None %}
+    <div class="card">
+        <div class="header">
+            <h2>{{bill_book.patient.user.username}}'s Bill Report</h2>
+            <ul class="header-dropdown">
+                <li class="dropdown"> <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="zmdi zmdi-more-vert"></i></a>
+                    <ul class="dropdown-menu pull-right">
+                        <li><a href="javascript:void(0);">Pay All</a></li>
+                    
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="body">
+            <div class="row sales-report">
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <h2><script>document.write(new Date().getFullYear())</script></h2>
+                        <p>Bill Report</p>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-12">
+                        <h1 class="text-right text-danger m-t-20">FCFA{{ bill_book.get_unpaid_total }}</h1>
+                    </div>
+                </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bill_book.bill_set.all %}
+                        <tr>
+                            <td class="txt-oflo">{{bill.get_description_display}}</td>
+                            {% if bill.paid %}
+                            <td><span class="label label-success">Paid</span> </td>
+                            {% else %}
+                            <td><span class="label label-danger">Not Paid</span></td>
+                            {% endif %}
+                            <td class="txt-oflo">{{bill.created}}</td>
+                            {% if bill.paid %}
+                            <td><span class="text-success">FCFA {{bill.amount}}</span></td>
+                            {% else %}
+                            <td><span class="text-danger">FCFA {{bill.amount}}</span></td>
+                            {% endif %}
+                            {% if not bill.paid %}
+                            <td><span class="text-success"><a href="{% url 'usermanagement:paybill' bill.id %}"><button class="btn btn-sm btn-primary"> Pay </button></a></span></td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                        <tr>
+                            <td class="txt-oflo"> Total </td>
+                            <td></td>  
+                            <td class="txt-oflo"></td>
+                            <td><span class="text-success">FCFA {{bill_book.get_total}}</span></td>
+                         </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+  </div>
+</section>
+
+<script>
+function Func() {
+  var input, filter, a;
+
+  // take user input
+  input = document.getElementById("userInput");
+  
+  // convert the input to upper case letter for easy comparison
+  filter = input.value.toUpperCase();
+
+  div = document.getElementById("Dropdown");
+
+  // get all the options as a list
+  a = div.getElementsByTagName("option");
+
+  // iterate through the entire list and output relevant results if found
+  for (var i = 0; i < a.length; i++) {
+    txtValue = a[i].textContent || a[i].innerText;
+    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+      a[i].style.display = "";
+    } else {
+      a[i].style.display = "none";
+    }
+  }
+}
+</script>
+
+{% endblock %}

@@ -13,12 +13,7 @@
                         <li><a href="{% url 'usermanagement:consultation_queue' 'Receptionist' %}">Consultation Queue</a></li>                    
                     </ul>
                 </li>
-                <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-balance-wallet"></i><span>Payments</span> </a>
-                    <ul class="ml-menu">
-                        <li> <a href="{% url 'usermanagement:add_payment' %}">Add Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:modify_payment' %}">Modify Payment</a></li>
-                        <li> <a href="{% url 'usermanagement:payments' %}">Payments</a></li>
-                    </ul>
+                <li><a href="{% url 'usermanagement:payment' %}"><i class="zmdi zmdi-balance-wallet"></i><span>Payment</span> </a>
                 </li>
 {% endblock %}
 {% block body %}

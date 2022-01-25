@@ -35,33 +35,37 @@ def return_to_home_page(request, role, patient_name):
 def search(request):
     patients = []
     role = request.GET.get('role')
-    if request.method == 'POST':
-        search = request.POST.get('search')
-        if search is not None:
-            users = CustomUser.objects.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search))
-            if len(users) > 0:
-                for user in users:
-                    try:
-                        patients.append(Patient.objects.get(user=user))
-                    except ObjectDoesNotExist:
-                        pass
-                if len(patients) == 0:
-                        messages.info(request, "Patient with Name '"+ search + "' does not exist")
-                        return return_to_home_page(request, role, 'None')
+    if role == 'Patient':
+        messages.info(request, "You are not allowed to search")
+        return return_to_home_page(request, role, request.user.username)
+    else:
+        if request.method == 'POST':
+            search = request.POST.get('search')
+            if search is not None:
+                users = CustomUser.objects.filter(Q(username__icontains=search) | Q(first_name__icontains=search) | Q(last_name__icontains=search))
+                if len(users) > 0:
+                    for user in users:
+                        try:
+                            patients.append(Patient.objects.get(user=user))
+                        except ObjectDoesNotExist:
+                            pass
+                    if len(patients) == 0:
+                            messages.info(request, "Patient with Name '"+ search + "' does not exist")
+                            return return_to_home_page(request, role, 'None')
+                    else:
+                        context = {'patients': patients,
+                                'role': role}
+                        return render(request, 'usermanagement/'+role.lower()+'-all-patients.html',context)
+                        
                 else:
-                    context = {'patients': patients,
-                               'role': role}
-                    return render(request, 'usermanagement/'+role.lower()+'-all-patients.html',context)
-                    
+                    messages.info(request, "Patient with Name '"+ search + "' does not exist")
+                    return return_to_home_page(request, role, 'None')
             else:
-                messages.info(request, "Patient with Name '"+ search + "' does not exist")
+                messages.info(request, "Please enter a keyword to search")
                 return return_to_home_page(request, role, 'None')
-        else:
-            messages.info(request, "Please enter a keyword to search")
-            return return_to_home_page(request, role)
-    
-    messages.info(request, "Please enter a keyword to search")
-    return return_to_home_page(request, role, 'None')
+        
+        messages.info(request, "Please enter a keyword to search")
+        return return_to_home_page(request, role, 'None')
             
 
 #view logic
@@ -98,7 +102,6 @@ def receptionist(request):
         first_name = request.POST.get('first_name')
         last_name = request.POST.get('last_name')
         tel = request.POST.get('tel')
-        age = request.POST.get('age')
         date_of_birth = request.POST.get('date_of_birth')
         person_to_contact = request.POST.get('person_to_contact')
         phone_no = request.POST.get('phone_no')
@@ -122,12 +125,11 @@ def receptionist(request):
             return redirect("usermanagement:receptionist")
         #if not,  create a new patient
         except ObjectDoesNotExist:
-            Patient.objects.create(
+            patient = Patient.objects.create(
                 user = user,
                 place_of_birth = place_of_birth,
                 person_to_contact = person_to_contact,
                 person_to_contact_tel = phone_no,
-                age = age,
                 gender = gender,
             )
             
@@ -136,6 +138,10 @@ def receptionist(request):
             
             #save the user attributes that have not been saved aready
             user.add_user_info(first_name, last_name, tel, address, date_of_birth, profession)
+            
+            #add the registration bill to the patient bill report 
+            bill_book = get_object_or_404(BillBook, patient=patient)
+            Bill.objects.create(bill_book=bill_book, description="RB", amount=500)
             
             messages.info(request, "Patient has been registered")
             return redirect("usermanagement:all_patients", role = "Receptionist")
@@ -159,7 +165,7 @@ def consultation(request):
         doctor = Doctor.objects.get(user=CustomUser.objects.get(username=selected_doctor))
         #verify if the patient has an on going consultation, before creating a new one
         try:
-            consultation = Consultation.objects.filter(patient=patient)[0]
+            consultation = Consultation.objects.filter(patient=patient).last()
             if consultation.status == "Pending":
                 messages.info(request, f"{patient} has a Pending consultation appointment with {consultation.doctor.user.username}")
                 return redirect("usermanagement:add_consultation")
@@ -168,18 +174,43 @@ def consultation(request):
                 return redirect("usermanagement:add_consultation")
             #if the consultation is complete, create a new consultation
             if consultation.status == "Complete":
-                Consultation.objects.create(
-                patient = patient,
-                doctor = doctor,
-                status = 'Pending'
-                )
+                bill_book = get_object_or_404(BillBook, patient=patient)
+                if bill_book.bill_set.filter(description='CB').last() is not None:
+                    if bill_book.bill_set.filter(description='CB').last().paid:
+                        Consultation.objects.create(
+                        patient = patient,
+                        doctor = doctor,
+                        status = 'Pending'
+                        )
+                        #add the Consultation fee to the patient bill report 
+                        Bill.objects.create(bill_book=bill_book, description="CB", amount=2000)
+                    else:
+                        messages.info(request, "Patient has not paid their last consultation fee")
+                        return redirect("usermanagement:add_consultation")
+                else:
+                    Consultation.objects.create(
+                        patient = patient,
+                        doctor = doctor,
+                        status = 'Pending'
+                        )
+                    #add the Consultation fee to the patient bill report 
+                    Bill.objects.create(bill_book=bill_book, description="CB", amount=2000)
+                
         #if there isn't any on going consultation, create a new consultation
         except (ObjectDoesNotExist, IndexError):
+            if len(patient.patientvitalcard_set.all()) < 1:
+                messages.info(request, "Request patient to take vital signs")
+                return redirect("usermanagement:add_consultation")
             Consultation.objects.create(
                 patient = patient,
                 doctor = doctor,
                 status = 'Pending'
                 )
+            
+            #add the Consultation fee to the patient bill report 
+            bill_book = get_object_or_404(BillBook, patient=patient)
+            Bill.objects.create(bill_book=bill_book, description="CB", amount=2000)
+            
     #return to the consultation queue to see that the created consultation has been added to queue
     messages.info(request, "Consultation appointment succefully added to queue")  
     return redirect("usermanagement:consultation_queue", consultant='Receptionist')
@@ -219,7 +250,7 @@ def patient_profile(request,role, patient_name):
             patient = Patient.objects.get(user = CustomUser.objects.get(username = patient_name))
         except ObjectDoesNotExist:
             messages.info(request, "Patient does not exist")
-            return return_to_home_page(request, role, patient_name)
+            return redirect('usermanagement:home')
         
         try:
             vitals = PatientVitalCard.objects.filter(patient = patient).latest('created') 
@@ -233,6 +264,10 @@ def patient_profile(request,role, patient_name):
             return redirect("usermanagement:doctor")
         except TypeError:
             consultation = None
+        try:
+            bill_book = BillBook.objects.get(patient=patient)
+        except ObjectDoesNotExist:
+            bill_book = None
         
         context = {
             'patient': patient,
@@ -240,7 +275,8 @@ def patient_profile(request,role, patient_name):
             'conId': request.GET.get('conId'),
             'consultation': consultation,
             'consultations':Consultation.objects.filter(patient=patient),
-            'role': role
+            'role': role, 
+            'bill_book': bill_book
         }
         #use the role to determine read/write access to the patient profile
         if role == 'Receptionist':
@@ -347,7 +383,7 @@ def consultation_queue(request, consultant):
     if consultant == 'Patient':
         #return the list of consultations that have thesame docotor in common with the patient making the request
         try:
-            consultation = Consultation.objects.filter(patient=Patient.objects.get(user=request.user))[0]
+            consultation = Consultation.objects.filter(patient=Patient.objects.get(user=request.user)).last()
         except (IndexError, ObjectDoesNotExist):
             consultations = None
             consultation = None
@@ -484,27 +520,30 @@ def doctor(request):
     request.user.active_role = 'Doctor'
     request.user.save()
     return redirect('usermanagement:consultation_queue', consultant = 'Doctor')
-#functionality for booking appointments
-@login_required
-def book_appointment(request):
-    return render(request, 'usermanagement/book-appointment.html')
 
 @login_required
-def modify_appointment(request):
-    return render(request, 'usermanagement/modify-appointment.html')
+def payment(request):
+    bill_book = None
+    if request.method == 'POST':
+        selected_patient = request.POST.get('selected_patient')
+        patient = Patient.objects.get(user=CustomUser.objects.get(username=selected_patient))
+        bill_book = get_object_or_404(BillBook, patient=patient)
+        
+    context = {
+        'all_patients': [patient.user.username for patient in Patient.objects.all()],
+        'bill_book': bill_book
+    }
+    return render(request, 'usermanagement/payment.html', context)
 
 @login_required
-def add_payment(request):
-    return render(request, 'usermanagement/add-payment.html')
+def paybill(request, id):
+    bill = Bill.objects.get(id=id)
+    bill.paid = True
+    bill.save()
+    messages.info(request, "Payment succesfull")
+    return redirect('usermanagement:payment')
 
-@login_required
-def modify_payment(request):
-    return render(request, 'usermanagement/modify-payment.html')
 
-@login_required
-def payments(request):
-    return render(request, 'usermanagement/payments.html')
-    
 @login_required
 def patient(request):
     request.user.active_role = 'Patient'

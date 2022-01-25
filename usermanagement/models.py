@@ -3,8 +3,10 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.contrib.postgres.fields import ArrayField
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.core.exceptions import ObjectDoesNotExist
+from dateutil.relativedelta import relativedelta
 
 #importing the user model from settings
 User = settings.AUTH_USER_MODEL
@@ -39,6 +41,13 @@ Status = [
     ('Complete', 'Complete'),
     ('On Hold', 'On Hold'),
 ]
+
+BillDescription = [
+    ('CB', 'Consultaiton Bill'),
+    ('RB', 'Registration Bill'),
+    ('PB', 'Pharmacy Bill'),
+    ('LB', 'Laboratory Bill')
+]
 #the custom user model that extends the django base user model adding the required attributes
 class CustomUser(AbstractUser):
     role = ArrayField(models.CharField(max_length = 50, choices = Roles), default = list, null=True, blank= True)
@@ -60,6 +69,10 @@ class CustomUser(AbstractUser):
         else:
             self.role.append(role)
             self.save()
+    
+    def get_age(self):
+        relativeage = relativedelta(timezone.now().date(), self.date_of_birth)
+        return relativeage.years
             
     #add patient/user information       
     def add_user_info(self, first_name, last_name, tel, address, date_of_birth, profession):
@@ -78,29 +91,28 @@ class Patient(models.Model):
     place_of_birth = models.CharField(max_length=200)
     person_to_contact = models.CharField(max_length=100)
     person_to_contact_tel = models.CharField(max_length=100)
-    age  = models.CharField(max_length=10)
     gender = models.CharField(max_length=10, choices = Gender)
     admitted = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-
-    def save(self, *args, **kwargs):
-        if not self.id:
-            self.created = timezone.now()
-        self.modified = timezone.now()
-        return super(Patient, self).save(*args, **kwargs)
     
     def __str__(self):
         return self.user.username
     
     def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        
         if 'Patient' in self.user.role:
             pass
         else:
             self.user.role.append('Patient')
-            self.user.save()
+            self.user.save() 
+            
         return super(Patient, self).save(*args, **kwargs)
-    
+
+        
     def delete(self, *args, **kwargs):
         if 'Patient' in self.user.role:
             self.user.role.remove('Patient')
@@ -259,6 +271,59 @@ class Nurse(models.Model):
     def __str__(self):
         return f"{self.user.username}"
     
+#bill book
+class BillBook(models.Model):
+    patient = models.OneToOneField(Patient, on_delete = models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(BillBook, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Biil Book for {self.patient.user.username}"
+    
+    def get_total(self):
+        total = 0
+        for bill in self.bill_set.all():
+            total += bill.amount
+        return total
+
+    def get_paid_total(self):
+        total = 0
+        for bill in self.bill_set.all():
+            if bill.paid:
+                total += bill.amount
+        return total
+    
+    def get_unpaid_total(self):
+        total = 0
+        for bill in self.bill_set.all():
+            if not bill.paid:
+                total += bill.amount
+        return total
+    
+#bill
+class Bill(models.Model):
+    bill_book = models.ForeignKey(BillBook, on_delete = models.CASCADE)
+    description = models.CharField(max_length=50, choices=BillDescription)
+    amount = models.IntegerField()
+    paid = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.id:
+            self.created = timezone.now()
+        self.modified = timezone.now()
+        return super(Bill, self).save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"Biil for {self.bill_book.patient.user.username}"
+    
     
 
 #HOOKS
@@ -285,8 +350,19 @@ def delete_nurse_role_hook(sender, instance, using, **kwargs):
     if 'Nurse' in instance.user.role:
             instance.user.role.remove('Nurse')
             instance.user.save()  
+
+@receiver(pre_delete, sender=Consultation)
+def delete_consultation_bill_hook(sender, instance, using, **kwargs):
+    try:
+        bill_book = BillBook.objects.get(patient=instance.patient)
+        bill_book.bill_set.all().last().delete()
+    except ObjectDoesNotExist:
+        pass
     
     
-    
-    
-    
+@receiver(post_save, sender=Patient)
+def add_registration_bill_hook(sender, instance, **kwargs):
+    try: 
+        bill_book = BillBook.objects.get(patient=instance)
+    except (ObjectDoesNotExist, ValueError):
+        BillBook.objects.create(patient=instance)
