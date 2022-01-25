@@ -77,7 +77,10 @@ def index(request):
 #the home view after sign in
 @login_required
 def home(request):
-    return render(request, 'usermanagement/home.html')
+    context = {
+        'departments': Department.objects.all()
+    }
+    return render(request, 'usermanagement/home.html', context)
 
 def handler404(request, *args, **argv):
     response = render(request, 'usermanagement/404.html')
@@ -197,7 +200,7 @@ def consultation(request):
                     Bill.objects.create(bill_book=bill_book, description="CB", amount=2000)
                 
         #if there isn't any on going consultation, create a new consultation
-        except (ObjectDoesNotExist, IndexError):
+        except (ObjectDoesNotExist, IndexError, AttributeError):
             if len(patient.patientvitalcard_set.all()) < 1:
                 messages.info(request, "Request patient to take vital signs")
                 return redirect("usermanagement:add_consultation")
@@ -384,7 +387,7 @@ def consultation_queue(request, consultant):
         #return the list of consultations that have thesame docotor in common with the patient making the request
         try:
             consultation = Consultation.objects.filter(patient=Patient.objects.get(user=request.user)).last()
-        except (IndexError, ObjectDoesNotExist):
+        except (IndexError, ObjectDoesNotExist, AttributeError):
             consultations = None
             consultation = None
             
@@ -549,7 +552,8 @@ def patient(request):
     request.user.active_role = 'Patient'
     return render(request, 'usermanagement/patient.html')
 
-
+def department_info(request, id):
+    pass
 
 # ALL CLASS BASED VIEWS
 

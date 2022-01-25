@@ -324,6 +324,22 @@ class Bill(models.Model):
     def __str__(self):
         return f"Biil for {self.bill_book.patient.user.username}"
     
+#Departments
+class Department(models.Model):
+    DepartmentChoices = [
+        ('GM', 'General Medicine'),
+        ('OPD', 'Out Patient Department'),
+        ('IP', 'In Patient Service'),
+        ('CD', 'Consultation Department'),
+        ('LB', 'Laboratory'),
+        ('PD', 'Pharmaceutical Department')
+    ]
+    name = models.CharField(max_length=40, choices=DepartmentChoices)
+    description = models.TextField()
+    icon = models.ImageField()
+    
+    def __str__(self):
+        return self.name
     
 
 #HOOKS
@@ -356,7 +372,7 @@ def delete_consultation_bill_hook(sender, instance, using, **kwargs):
     try:
         bill_book = BillBook.objects.get(patient=instance.patient)
         bill_book.bill_set.all().last().delete()
-    except ObjectDoesNotExist:
+    except (ObjectDoesNotExist, AttributeError):
         pass
     
     

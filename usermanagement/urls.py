@@ -20,4 +20,5 @@ urlpatterns = [
     path('consultation_info/<int:conId>/', consultation_info, name='consultation_info'),
     path('modify_prescription/<int:conId>/',modify_prescription, name='modify_prescription'),
     path('search/', search , name="search"),
+    path('department_info/<int:id>/', department_info, name='department_info')
 ]

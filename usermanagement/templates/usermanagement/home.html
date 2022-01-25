@@ -87,10 +87,9 @@
                 
                 <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span>Departments</span> </a>
                     <ul class="ml-menu">
-                        <li><a href="#">Dental</a></li>
-                        <li><a href="#">Cardiac</a></li>                       
-                        <li><a href="#">Gastro</a></li>
-                        <li><a href="#">Nervous</a></li>
+                        {% for department in departments %}
+                        <li><a href="#">{{department.get_name_display}}</a></li>
+                        {% endfor %}
                     </ul>
                 </li>
             </ul>
@@ -118,6 +117,21 @@
         <small class="text-muted">Welcome to Polyclinic Fultang</small>
         <h1> Home page </h1>
         <p> brief introduction about polyclinic Fultang </p>
+    </div>
+
+    <div class="row clearfix">
+        {% for department in departments %}
+        <div class="col-lg-3 col-md-6 col-sm-12">
+            <div class="card">
+                <a href="#"><img style="height:168px;" class="card-img-top" src="{{department.icon.url}}" alt="Card image"></a>
+                <div class="card-body">
+                    <h4 class="card-title">{{department.get_name_display}}</h4>
+                    <p class="card-text">{{department.description}}</p>
+                    {% comment %} <a href="#" class="btn btn-raised g-bg-cyan waves-effect waves-effect">Deparment Info</a> {% endcomment %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
 </section> 
 
