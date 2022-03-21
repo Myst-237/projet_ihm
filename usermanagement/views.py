@@ -19,8 +19,7 @@ def has_patient_profile_permission(request, patient_name):
         else:
             return False
         
-        
-        
+#return home for each role
 def return_to_home_page(request, role, patient_name):
     if role == 'Doctor':
         return redirect('usermanagement:doctor')
@@ -31,7 +30,7 @@ def return_to_home_page(request, role, patient_name):
     if role == 'Patient':
         return redirect('usermanagement:patient_profile', role=role, patient_name=patient_name)
     
-        
+#search function
 def search(request):
     patients = []
     role = request.GET.get('role')
@@ -53,8 +52,10 @@ def search(request):
                             messages.info(request, "Patient with Name '"+ search + "' does not exist")
                             return return_to_home_page(request, role, 'None')
                     else:
-                        context = {'patients': patients,
-                                'role': role}
+                        context = {
+                                'patients': patients,
+                                'role': role
+                                }
                         return render(request, 'usermanagement/'+role.lower()+'-all-patients.html',context)
                         
                 else:

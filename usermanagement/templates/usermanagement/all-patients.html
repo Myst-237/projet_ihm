@@ -1,4 +1,4 @@
-
+{% load static %}
 <section class="content patients">
     <div class="container-fluid">
         <div class="block-header">
@@ -26,13 +26,17 @@
                     <div class="body">
                         <div class="row">
                             <div class="col-md-4 col-sm-4 text-center m-b-0">
-                                <a href="{% url 'usermanagement:patient_profile' role=role patient_name=patient.user.username %}" class="p-profile-pix"><img src="http://via.placeholder.com/130x130" alt="user" class="img-thumbnail img-fluid"></a>
+                                {% if patient.user.profile_pic %}
+                                    <a href="{% url 'usermanagement:patient_profile' role=role patient_name=patient.user.username %}" class="p-profile-pix"><img src="{{patient.user.profile_pic.url}}" alt="user" class="img-thumbnail img-fluid"></a>
+                                {% else %}    
+                                    <a href="{% url 'usermanagement:patient_profile' role=role patient_name=patient.user.username %}" class="p-profile-pix"><img src="{% static 'usermanagement/images/image-1.jpg' %}" class="img-fluid" alt=""></a>                            
+                                {% endif %}
                             </div>
                             <div class="col-md-8 col-sm-8 m-b-0">
                                 <h5 class="m-b-0"> {{patient.user.first_name}} {{patient.user.last_name}} </h5></a></h5> <small>{{patient.gender}}</small>
                                 <address class="m-b-0">
                                     {{patient.user.address}}<br>
-                                    <abbr title="Phone">P:</abbr> {{patient.user.tel}}
+                                    <abbr title="Phone">Tel:</abbr> {{patient.user.tel}}
                                 </address>
                             </div>
                         </div>
