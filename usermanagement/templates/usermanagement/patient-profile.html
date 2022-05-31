@@ -117,7 +117,7 @@
                                     </div> 
                                         <hr>
                                         <ul class="dis">
-                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('obs','obs-btn','Add Observation')" id="obs-btn"> Observations </button>
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('obs','obs-btn','Observations')" id="obs-btn"> Observations </button>
                                             <form style="display: none;" id="obs" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
                                                 <textarea required rows="8" cols="80" name="observations" placeholder="Observations...">{{observations}}</textarea>
@@ -127,7 +127,7 @@
                                         </ul>
                                         <hr>
                                         <ul class="dis">
-                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('ref','ref-btn','Add Reference')" id="ref-btn"> References </button>
+                                            <button class="btn btn-primary custom-btn-width" onClick="showTextarea('ref','ref-btn','References')" id="ref-btn"> References </button>
                                             <form style="display: none;" id="ref" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
                                                 <textarea required rows="8" cols="80" name="references" placeholder="References...">{{references}}</textarea>
@@ -187,7 +187,7 @@
                                                         {% csrf_token %}
                                                         <input type="hidden" name="hold_consultation" value="Hold">
                                                         <div class="text-center">
-                                                            <button type="submit" class="btn btn-sm btn-danger ml-4" > Hold Consultation </button>
+                                                            <button type="submit" class="btn btn-sm btn-secondary ml-4" > Hold Consultation </button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -291,7 +291,7 @@
 function showTextarea(formid,buttonid,text) {
     if( document.getElementById(formid).style.display == 'none' ) {
         document.getElementById(formid).style.display = 'block';
-        document.getElementById(buttonid).innerHTML = 'Close'
+        document.getElementById(buttonid).innerHTML = text
     }else{
         document.getElementById(formid).style.display = 'none';
         document.getElementById(buttonid).innerHTML = text

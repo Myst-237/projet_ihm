@@ -96,6 +96,29 @@ def handler500(request, *args, **argv):
 
 #the receptionist view
 @login_required
+def receptionist_home(request):
+    request.user.active_role = 'Receptionist'
+    request.user.save()
+    context = {
+        'pending_consultations':Consultation.objects.filter(status = 'Pending').count(),
+        'patients_registered': Patient.objects.all().count(),
+        'patients_admitted': Patient.objects.filter(admitted=True).count(),
+    }
+    return render(request, 'usermanagement/receptionist-home.html',context)
+
+
+def nurse_home(request):
+    request.user.active_role = 'Nurse'
+    request.user.save()
+    context = {
+        'pending_consultations':Consultation.objects.filter(status = 'Pending').count(),
+        'patients_registered': Patient.objects.all().count(),
+        'patients_admitted': Patient.objects.filter(admitted=True).count(),
+    }
+    return render(request, 'usermanagement/nurse-home.html',context)
+
+    
+#add patient
 def receptionist(request):
     request.user.active_role = 'Receptionist'
     request.user.save()
@@ -523,7 +546,11 @@ def modify_prescription(request, conId):
 def doctor(request):
     request.user.active_role = 'Doctor'
     request.user.save()
-    return redirect('usermanagement:consultation_queue', consultant = 'Doctor')
+    context = {
+        'consultations': Doctor.objects.get(user=request.user).consultation_set.all(),
+    }
+    #redirect('usermanagement:consultation_queue', consultant = 'Doctor')
+    return render(request, 'usermanagement/doctor-home.html', context)
 
 @login_required
 def payment(request):

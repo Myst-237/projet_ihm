@@ -99,7 +99,17 @@
         <div class="menu">
             <ul class="list">
                 <li class="header">MAIN NAVIGATION</li>
-                <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Dashboard</span></a></li> 
+                {% if active_role == 'Doctor' %}
+                <li class="active open"><a href="{% url 'usermanagement:doctor' %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% elif active_role == 'Receptionist' %}
+                <li class="active open"><a href="{% url 'usermanagement:receptionist_home' %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% elif active_role == 'Patient' %}
+                <li class="active open"><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% elif active_role == 'Nurse' %}
+                <li class="active open"><a href="{% url 'usermanagement:nurse_home' %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% else %}
+                <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% endif %}
                 {% block dashbord %}
 
                 {% endblock %}
