@@ -23,9 +23,9 @@
             <div class="col-lg-4 col-md-12 col-sm-12">
                 <div class=" card patient-profile">
                     {% if patient.user.profile_pic %}
-                        <img src="{{patient.user.profile_pic.url}}" class="img-fluid" alt=""> 
+                        <img class="img-style" src="{{patient.user.profile_pic.url}}" class="img-fluid" alt=""> 
                     {% else %}    
-                        <img src="{% static 'usermanagement/images/image-1.jpg' %}" class="img-fluid" alt="">                               
+                        <img class="img-style" src="{% static 'usermanagement/images/default-pp.jpeg' %}" class="img-fluid" alt="">                               
                     {% endif %}
                 </div>
                 <div class="card">
@@ -120,9 +120,10 @@
                                             <button class="btn btn-primary custom-btn-width" onClick="showTextarea('obs','obs-btn','Observations')" id="obs-btn"> Observations </button>
                                             <form style="display: none;" id="obs" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
-                                                <textarea required rows="8" cols="80" name="observations" placeholder="Observations...">{{observations}}</textarea>
+                                                <textarea style="max-width:95%;" required rows="8" cols="80" name="observations" placeholder="Observations...">{{observations}}</textarea>
                                                 <br>
                                                 <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('obs','obs-btn','Observations')"> Submit </button>
+                                                <button class="btn btn-sm btn-danger" onClick="cancelTextarea('obs','obs-btn')"> Cancel </button>
                                             </form>
                                         </ul>
                                         <hr>
@@ -130,9 +131,10 @@
                                             <button class="btn btn-primary custom-btn-width" onClick="showTextarea('ref','ref-btn','References')" id="ref-btn"> References </button>
                                             <form style="display: none;" id="ref" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
-                                                <textarea required rows="8" cols="80" name="references" placeholder="References...">{{references}}</textarea>
+                                                <textarea style="max-width:95%;"  required rows="8" cols="80" name="references" placeholder="References...">{{references}}</textarea>
                                                 <br>
                                                 <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('ref','ref-btn','References')"> Submit </button>
+                                                <button class="btn btn-sm btn-danger" onClick="cancelTextarea('ref','ref-btn')"> Cancel </button>
                                             </form>
                                         </ul>
                                         <hr>
@@ -140,9 +142,10 @@
                                             <button class="btn btn-primary custom-btn-width" onClick="showTextarea('med','med-btn','Prescribe Medication')" id="med-btn">Prescribe Medication </button>
                                             <form style="display: none;" id="med" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
-                                                <textarea required rows="8" cols="80" name="prescriptions" placeholder="Medications...">{{prescriptions}}</textarea>
+                                                <textarea style="max-width:95%;" required rows="8" cols="80" name="prescriptions" placeholder="Medications...">{{prescriptions}}</textarea>
                                                 <br>
                                                 <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('med','med-btn','Prescribe Medication')"> Submit </button>
+                                                <button class="btn btn-sm btn-danger" onClick="cancelTextarea('med','med-btn')"> Cancel </button>
                                             </form>
                                         </ul>
                                         <hr>
@@ -150,9 +153,10 @@
                                             <button class="btn btn-primary custom-btn-width" onClick="showTextarea('lab','lab-btn','Laboratory Tests')" id="lab-btn">Laboratory Tests </button>
                                             <form style="display: none;" id="lab" method='post' action="{% url 'usermanagement:doctor_report' conId %}">
                                                 {% csrf_token %}
-                                                <textarea required rows="8" cols="80" name="lab_tests" placeholder="Lab Tests...">{{lab_tests}}</textarea>
+                                                <textarea style="max-width:95%;" required rows="8" cols="80" name="lab_tests" placeholder="Lab Tests...">{{lab_tests}}</textarea>
                                                 <br>
                                                 <button type="submit" class="btn btn-sm btn-success" onClick="hideTextarea('lab','lab-btn','Laboratory Tests')"> Submit </button>
+                                                <button class="btn btn-sm btn-danger" onClick="cancelTextarea('lab','lab-btn')"> Cancel </button>
                                             </form>
                                         </ul>
                                         
@@ -301,5 +305,8 @@ function showTextarea(formid,buttonid,text) {
 function hideTextarea(formid,buttonid,text) {
     document.getElementById(formid).style.display = 'none';
     document.getElementById(buttonid).innerHTML = text
+}
+function cancelTextarea(formid,buttonid) {
+    document.getElementById(formid).style.display = 'none';
 }
 </script>

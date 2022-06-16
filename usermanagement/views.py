@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .models import *
-from django.views.generic.edit import DeleteView
+from django.views.generic.edit import DeleteView,CreateView,UpdateView
+from django.views.generic.list import ListView
+from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.template import RequestContext
 from django.db.models import Q
@@ -74,6 +76,40 @@ def search(request):
 #the index view that appears when you first launch the application
 def index(request):
     return render(request, 'usermanagement/index.html')
+
+def user_profile(request, user):
+    return render(request, 'usermanagement/user-profile.html')
+
+#the administrator page
+def administrator(request):
+    if request.user.is_superuser:
+        request.user.active_role = 'Admin'
+        request.user.save()
+        total = 0
+        unpaid_total = 0
+        paid_total = 0
+        
+        for book in BillBook.objects.all():
+            total = total + book.get_total()
+            paid_total = paid_total + book.get_paid_total()
+            unpaid_total = unpaid_total + book.get_unpaid_total()
+                
+        context = {
+            'users': CustomUser.objects.all(), 
+            'pending_consultations':Consultation.objects.filter(status = 'Pending').count(),
+            'patients_registered': Patient.objects.all().count(),
+            'patients_admitted': Patient.objects.filter(admitted=True).count(),
+            'total_consultations':Consultation.objects.all().count(),
+            'doctors': Doctor.objects.all().count(),
+            'receptionists': Receptionist.objects.all().count(),
+            'nurses': Nurse.objects.all().count(),
+            'total_made': total,
+            'paid_total': paid_total,
+            'unpaid_total': unpaid_total
+            }
+        return render(request, 'usermanagement/admin.html', context)
+    else:
+        return redirect('home')
 
 #the home view after sign in
 @login_required
@@ -589,6 +625,69 @@ def department_info(request, id):
 class ConsultationDeleteView(DeleteView):
     model = Consultation
     success_url = reverse_lazy('usermanagement:consultation_queue', kwargs = {'consultant': 'Receptionist'})
+    
+class DoctorCreateView(CreateView):
+    model = Doctor
+    template_name = 'usermanagement/admin-add-doctor.html'
+    fields = '__all__'
+    
+class DoctorListView(ListView):
+    model = Doctor
+    template_name = 'usermanagement/admin-list-doctors.html'
+    fields = '__all__'
+    
+class DoctorDeleteView(DeleteView):
+    model = Doctor
+    success_url = reverse_lazy('usermanagement:list-doctors')
+    template_name = 'usermanagement/admin-delete-doctor.html'
+    
+class ReceptionistCreateView(CreateView):
+    model = Receptionist
+    template_name = 'usermanagement/admin-add-receptionist.html'
+    fields = '__all__'
+    
+class ReceptionistListView(ListView):
+    model = Receptionist
+    template_name = 'usermanagement/admin-list-receptionists.html'
+    fields = '__all__'
+    
+class ReceptionistDeleteView(DeleteView):
+    model = Receptionist
+    success_url = reverse_lazy('usermanagement:list-receptionists')
+    template_name = 'usermanagement/admin-delete-receptionist.html'
+    
+class NurseCreateView(CreateView):
+    model = Nurse
+    template_name = 'usermanagement/admin-add-nurse.html'
+    fields = '__all__'
+    
+class NurseListView(ListView):
+    model = Nurse
+    template_name = 'usermanagement/admin-list-nurses.html'
+    fields = '__all__'
+    
+class NurseDeleteView(DeleteView):
+    model = Nurse
+    success_url = reverse_lazy('usermanagement:list-nurses')
+    template_name = 'usermanagement/admin-delete-nurse.html'
+    
+    
+class PatientListView(ListView):
+    model = Patient
+    template_name = 'usermanagement/admin-list-patients.html'
+    fields = '__all__'
+    
+class PatientDeleteView(DeleteView):
+    model = Patient
+    success_url = reverse_lazy('usermanagement:list-patients')
+    template_name = 'usermanagement/admin-delete-patient.html'
+    
+class UserUpdateView(UpdateView):
+    model = CustomUser
+    template_name = 'usermanagement/user-profile.html'
+    fields = ['first_name', 'last_name', 'email','tel', 'address', 'profession','profile_pic', 'about' ]
+
+
 
     
 

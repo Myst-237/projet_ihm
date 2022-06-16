@@ -1,0 +1,27 @@
+{% extends "usermanagement/base-executive.html" %} 
+{% block title %} Administrator {% endblock %} 
+{% block dashbord %}  
+        <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span> Doctor</span> </a>
+            <ul class="ml-menu">
+                <li><a href="{% url 'usermanagement:list-doctors' %}">List Doctors</a></li>   
+                <li><a href="{% url 'usermanagement:add-doctor' %}">Add Doctor</a></li>   
+            </ul>
+        </li>
+        <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span> Receptionist</span> </a>
+            <ul class="ml-menu">
+                <li><a href="{% url 'usermanagement:list-receptionists' %}">List Receptionists</a></li>   
+                <li><a href="{% url 'usermanagement:add-receptionist' %}">Add Receptionist</a></li>   
+            </ul>
+        </li>
+        <li><a href="javascript:void(0);" class="menu-toggle"><i class="zmdi zmdi-account-o"></i><span> Nurse</span> </a>
+            <ul class="ml-menu">
+                <li><a href="{% url 'usermanagement:list-nurses' %}">List Nurses</a></li>   
+                <li><a href="{% url 'usermanagement:add-nurse' %}">Add Nurse</a></li>   
+            </ul>
+        </li>
+        <li><a href="{% url 'usermanagement:list-patients' %}"><i class="zmdi zmdi-account-o"></i><span> Patients</span></a></li>   
+{% endblock %}
+{% block body %}
+
+
+{% endblock %}

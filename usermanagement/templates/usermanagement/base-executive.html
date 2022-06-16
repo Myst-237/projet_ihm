@@ -69,22 +69,21 @@
         <!-- User Info -->
         <div class="user-info">
             {% if user.profile_pic %}
-                <div class="admin-image"> <img src="{{user.profile_pic.url}}" alt=""> </div>
+                <div class="admin-image"> <a href="{% url 'usermanagement:user-profile' user.id %}"> <img class="img-style-pp" src="{{user.profile_pic.url}}" alt=""> </a> </div>
             {% else %}
-                <div class="admin-image"> <img src="{% static 'usermanagement/images/random-avatar7.jpg' %}" alt=""> </div>
+                <div class="admin-image"> <a href="{% url 'usermanagement:user-profile' user.id %}"> <img class="img-style-pp" src="{% static 'usermanagement/images/default-pp.jpeg' %}" alt=""> </a> </div>
             {% endif %}
             <div class="admin-action-info"> <span>Welcome</span>
                 <h3>{{ user.username|capfirst }}</h3>
                 <ul>
-                    {% if is_patient %}
-                    <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
-                    {% endif %}
+                    <li><span style="color:white"> Sign Out </span></li>
                     <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
+
                 </ul>
             </div>
             <div class="quick-stats">
-                <h5>You are Working as A</h5>
-                <h5> {{ active_role }}
+                <h5 style="text-align:center">Your Active Role:</h5>
+                <h5 style="text-align:center"> {{ active_role }}
                 {% comment %} <ul>
                     <li><span>16<i>Patient</i></span></li>
                     <li><span>20<i>Panding</i></span></li>
@@ -107,6 +106,8 @@
                 <li class="active open"><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
                 {% elif active_role == 'Nurse' %}
                 <li class="active open"><a href="{% url 'usermanagement:nurse_home' %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
+                {% elif active_role == 'Admin' %}
+                <li class="active open"><a href="{% url 'usermanagement:administrator' %}"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
                 {% else %}
                 <li class="active open"><a href="#"><i class="zmdi zmdi-home"></i><span>Home</span></a></li> 
                 {% endif %}

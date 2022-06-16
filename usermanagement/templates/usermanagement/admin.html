@@ -1,0 +1,121 @@
+{% extends "usermanagement/base-admin.html" %} 
+{% block title %} Administrator {% endblock %} 
+
+{% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="block-header">
+      <h2>Administrator</h2>
+      <small class="text-muted">Polyclinic Fultang</small>
+    </div>
+      {% if messages %}
+              <div>
+                  <ul>
+                  {% for message in messages %}
+                  <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                          <strong>{{message}}</strong>
+                          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                  </div>
+                  {% endfor %}
+                  </ul>
+              </div>
+          {% endif %}
+
+          <div class="row clearfix">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div class="card">
+                <div class="header">
+                  <h2>General Statistics</h2>
+                </div>
+
+                <div class="tab-content">        
+                  <div role="tabpanel" class="tab-pane active" id="timeline">
+                      <div class="timeline-body">
+                          <div class="table-responsive">
+                              <table class="table table-striped">
+                                  <thead>
+                                  <tr>
+                                      <th> Number of Doctors  </th>
+                                      <th> Number of Nurses  </th>
+                                      <th> Number of Recptionists  </th>
+                                  </tr>
+                                  </thead>
+                                  <tbody>
+                                  <tr>
+                                      <td>{{ doctors }}</td>
+                                      <td> {{ nurses }} </td>
+                                      <td> {{ receptionists }} </td>
+                                  </tr>
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  </div>      
+              </div>
+
+                  <div class="tab-content">        
+                      <div role="tabpanel" class="tab-pane active" id="timeline">
+                          <div class="timeline-body">
+                              <div class="table-responsive">
+                                  <table class="table table-striped">
+                                      <thead>
+                                      <tr>
+                                          <th> Patients Registered  </th>
+                                          <th> Pateints Admitted </th>
+                                          <th> Pending Consultations </th>
+                                          <th> Total Consultations </th>
+                                      </tr>
+                                      </thead>
+                                      <tbody>
+                                      <tr>
+                                          <td>{{ patients_registered }}</td>
+                                          <td> {{ patients_admitted }} </td>
+                                          <td> {{ pending_consultations }} </td>
+                                          <td> {{ total_consultations }} </td>
+                                      </tr>
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>      
+                  </div>
+
+                  <h3> Financial Statistics </h3>
+
+                  <div class="tab-content">        
+                    <div role="tabpanel" class="tab-pane active" id="timeline">
+                        <div class="timeline-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th> Total (Made by Clinic)   </th>
+                                        <th> Paid Total </th>
+                                        <th> UnPaid Total  </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr>
+                                        <td>{{ total_made }} FCFA</td>
+                                        <td> {{ paid_total }} FCFA</td> 
+                                        <td> {{ unpaid_total }} FCFA</td> 
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>      
+                </div>
+
+
+              </div>
+            </div>
+          </div>    
+
+    
+  </div>
+</section>
+
+{% endblock %}

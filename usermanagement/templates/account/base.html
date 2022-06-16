@@ -1,42 +1,63 @@
+{% load static %}
+
+<!DOCTYPE html>
 <html>
 
+<!-- Mirrored from thememakker.com/templates/swift/hospital/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 20 Nov 2021 08:11:15 GMT -->
 <head>
- {% load static %}
-    <link rel="stylesheet" href="{% static 'account/Css/Custom-Account-Styles.css' %}" type = "text/css"/>
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
-    <!-- Font Awesome Icons -->
-
-{% block head_links %}
-{% endblock %}
-
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<title>{% block title %}  {%endblock %} </title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="{% static 'usermanagement/plugins/bootstrap/css/bootstrap.min.css' %}"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" type="text/css">
+<link rel="stylesheet" href="{% static 'usermanagement/plugins/morrisjs/morris.css' %}"/>
+<!-- Custom Css -->
+<link rel="stylesheet" href="{% static 'usermanagement/css/main.css' %}"/>
+<link rel="stylesheet" href="{% static 'usermanagement/css/mystyle.css' %}"/>
 </head>
 
-<body>
+<body class="theme-cyan">
+<!-- Page Loader -->
+<div class="page-loader-wrapper">
+    <div class="loader">
+        <div class="preloader">
+            <div class="spinner-layer pl-cyan">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div>
+                <div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <p>Please wait...</p>
+    </div>
+</div>
+    
+<div class="container">
+    {% block content %}
+ 
+     {% endblock %}
+</div>
 
-    {% block content%}
-    
-	    {% block messages %}
-        {% endblock %}
-    
-    {% endblock %}
-    
-    {% block content_extra %}
-    {% endblock %}
-    
-    {% block extra_body %}
-    {% endblock %}
+<div class="color-bg-custom"></div>
+
+<!-- Jquery Core Js --> 
+<script src="{% static 'usermanagement/bundles/libscripts.bundle.js' %}"></script> <!-- Lib Scripts Plugin Js --> 
+<script src="{% static 'usermanagement/bundles/vendorscripts.bundle.js' %}"></script> <!-- Lib Scripts Plugin Js --> 
+
+<script src="{% static 'usermanagement/bundles/chartscripts.bundle.js' %}"></script> <!-- Chart Plugins Js -->
+<script src="{% static 'usermanagement/bundles/sparklinescripts.bundle.js' %}"></script> <!-- Chart Plugins Js -->
+
+<script src="{% static 'usermanagement/bundles/mainscripts.bundle.js' %}"></script><!-- Custom Js -->
+<script src="{% static 'usermanagement/js/pages/index.js' %}"></script>
+<script src="{% static 'usermanagement/js/pages/charts/sparkline.min.js' %}"></script>
 </body>
+
+<!-- Mirrored from thememakker.com/templates/swift/hospital/ by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 20 Nov 2021 08:11:50 GMT -->
 </html>
+
+
+

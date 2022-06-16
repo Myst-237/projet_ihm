@@ -1,52 +1,32 @@
 {% extends "account/base.html" %}
 
 {% load i18n %}
+{% load widget_tweaks %}
+{% block title %} Sign Up {%endblock %} 
 
 {% block head_title %}{% trans "Signup" %}{% endblock %}
-{% block head_links %} 
-
-<title>Signup</title>
-
-{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
+<div style="max-width:600px; margin:0 auto; margin-top:90px; background:linear-gradient(45deg, #49c5b6, #ab9ae5); padding:3px;">
+  <div class="container">
+  <h1>{% trans "Sign Up" %}</h1>
 
- {% block messages %}
-    {% if messages %}
-    <div>
-        <ul>
-        {% for message in messages %}
-        <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                <strong>{{message}}</strong>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-        </div>
-        {% endfor %}
-        </ul>
-    </div>
+  <p>{% blocktrans %}Already have an account? Then please <a href="{{login_url }}">sign in</a>.{% endblocktrans %}</p>
+
+  <form class="signup" id="signup_form" method="post" action="{% url 'account_signup' %}">
+    {% csrf_token %}
+      {% include 'account/snippets/bs4_form.html' with form=form %}
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{redirect_field_name }}" value="{{redirect_field_value }}"/>
     {% endif %}
-  {% endblock %}
+
   
-
-<h3 class="h3" id="head_banner">{% trans "Sign Up" %}</h3>
-
-<p class="exist_account_info">{% blocktrans %}Already have an account? Then please <a href="{{ login_url }}">sign in</a>.{% endblocktrans %}</p>
-
-<form class="container-fluid text-center" id="signup_form" method="post" action="{% url 'account_signup' %}">
-  {% csrf_token %}
-
-  {{ form.as_p }}
-
-  {% if redirect_field_value %}
-
-  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    <div class="form-group">
+    <button type="submit" class="btn btn-success">{% trans "Sign Up" %}</button>
   
-  {% endif %}
-  
-  <button class="btn btn-outline-primary btn-lg" type="submit">{% trans "Sign Up" %}</button>
-</form>
-
+    </div>
+  </form>
+  </div
 </div>
+
 {% endblock %}

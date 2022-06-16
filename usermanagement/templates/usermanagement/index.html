@@ -50,17 +50,14 @@
         </ul>
     </div>
     {% endif %}
+    <div class="parent container" style="margin-top:200px">
+        <div class="child">
+            <p class="welcome-title"> Welcome to Fultang Polyclinic </p>
+            <p class="welcome-content"> Already have an account? &ensp; <a class="btn btn-primary signin-align" href="{% url 'account_login' %}" role="button">Sign In</a> </span> </p>
+            <p class="welcome-content"> Register Here for an Account &ensp; <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">Register</a></p>
+         </div>
+    </div>
     
-<div class="container">
-    <div class="welcome">
-        <h1> Welcome to Polyclinic Fultang </h1>
-    </div>
-
-    <div class="custom-login">
-        <p class="custom-text"> Already have an account? &ensp; <a class="btn btn-primary" href="{% url 'account_login' %}" role="button">Signin</a> </p>
-        <p class="custom-text"> Register Here for an Account &ensp; <a class="btn btn-primary" href="{% url 'account_signup' %}" role="button">Register</a></p>
-    </div>
-</div>
 
 <div class="color-bg-custom"></div>
 

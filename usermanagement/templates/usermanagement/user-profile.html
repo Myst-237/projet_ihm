@@ -1,0 +1,71 @@
+{% extends "usermanagement/base-executive.html" %} 
+{% block title %} User Profile {% endblock %} 
+{% load crispy_forms_tags %}
+
+{% block body %}
+{% load static %}
+<section class="content profile-page">
+    <div class="container-fluid">
+        <div class="block-header">
+            <h2>{{user.username}}'s Profile</h2>
+            <small class="text-muted">Polyclinic Fultang</small>
+        </div>        
+        {% if messages %}
+        <div> 
+            <ul>
+            {% for message in messages %}
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <strong>{{message}}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+            </div>
+            {% endfor %}
+            </ul>
+        </div>
+         {% endif %}
+        <div class="row clearfix">
+            <div class="col-lg-4 col-md-12 col-sm-12">
+                <div class=" card patient-profile">
+                    {% if user.profile_pic %}
+                        <img src="{{user.profile_pic.url}}" class="img-fluid img-style" alt=""> 
+                    {% else %}    
+                        <img src="{% static 'usermanagement/images/default-pp.jpeg' %}" class="img-fluid" alt="">                               
+                    {% endif %}
+                </div>
+                <div class="card">
+                    <div class="header">
+                        <h2>About Me</h2>
+                    </div>
+                    <div class="body">
+                        <strong>Name</strong>
+                        <p>{{user.first_name}} {{user.last_name}}</p>
+                        <strong>Age</strong>
+                        <p>{{user.get_age}}</p>
+                        <strong>Occupation</strong>
+                        <p>{{user.profession}}</p>
+                        <strong>Email ID</strong>
+                        <p>{{user.email}}</p>
+                        <strong>Phone</strong>
+                        <p>{{user.tel}}</p>
+                        <hr>
+                        <strong>Address</strong>
+                        <address>{{user.address}}</address>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-12 col-sm-12">
+                <h3 style="text-align:center">Edit Profile </h3>
+                <div class="container" style="padding:10px;">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy}}
+                        <input type="submit" value="Update">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

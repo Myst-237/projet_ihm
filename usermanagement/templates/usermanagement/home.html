@@ -54,18 +54,25 @@
         <!-- User Info -->
         <div class="user-info">
             {% if user.profile_pic %}
-                <div class="admin-image"> <img src="{{user.profile_pic.url}}" alt=""> </div>
+                <div class="admin-image"> <a href="{% url 'usermanagement:user-profile' user.id %}">
+                    <img 
+                        style="max-height: 99px;
+                        max-width: 99px;
+                        object-fit: contain;
+                        border-radius: 50%;" src="{{user.profile_pic.url}}" alt=""> </a> </div>
             {% else %}
-                <div class="admin-image"> <img src="{% static 'usermanagement/images/random-avatar7.jpg' %}" alt=""> </div>
+                <div class="admin-image"> <a href="{% url 'usermanagement:user-profile' user.id %}"> 
+                    <img
+                        style="max-height: 99px;
+                        max-width: 99px;
+                        object-fit: contain;
+                        border-radius: 50%;" src="{% static 'usermanagement/images/default-pp.jpeg' %}" alt=""> </a> </div>
             {% endif %}
             <div class="admin-action-info"> <span>Welcome</span>
                 <h3>{{ user.username|capfirst }}</h3>
                 <ul>
-                    {% if is_patient %}
-                    <li><a href="{% url 'usermanagement:patient_profile' role='Patient' patient_name=user.username %}" title="Go to Profile"><i class="zmdi zmdi-account"></i></a></li>
-                    {% endif %}
-                    <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
                     <li><span style="color:white"> Sign Out </span></li>
+                    <li><a href="{% url 'account_logout' %}" title="sign out" ><i class="zmdi zmdi-sign-in"></i></a></li>
                 </ul>
             </div>
             <div class="quick-stats">

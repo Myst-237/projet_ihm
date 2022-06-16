@@ -1,29 +1,35 @@
 {% extends "account/base.html" %}
 
 {% load i18n %}
+{% block title %} Log Out {%endblock %}
 
 {% block head_title %}{% trans "Sign Out" %}{% endblock %}
 
+
 {% block content %}
-<div class="container-fluid">
+<div style="width:400px; margin:0 auto; margin-top:170px;  background:linear-gradient(45deg, #49c5b6, #ab9ae5); padding:3px;">
 
-<h3 class="h3" id="head_banner">{% trans "Sign Out" %}</h3>
+    <div class="container text-center">
 
-<p class="confirm_logout_info">{% trans 'Are you sure you want to sign out?' %}</p>
+        <h3 class="h3" id="head_banner">{% trans "Sign Out" %}</h3>
 
-<form class="container-fluid text-center" id="logout_form" method="post" action="{% url 'account_logout' %}">
-  {% csrf_token %}
+        <p class="confirm_logout_info">{% trans 'Are you sure you want to sign out?' %}</p>
 
-  {% if redirect_field_value %}
+        <form class="signup" id="logout_form" method="post" action="{% url 'account_logout' %}">
 
-  	<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+          {% csrf_token %}
+            {% include 'account/snippets/bs4_form.html' with form=form %}
+          {% if redirect_field_value %}
+          <input type="hidden" name="{{redirect_field_name }}" value="{{redirect_field_value }}"/>
+          {% endif %}
+          
+          <div class="form-group ">
+            <button  class="btn btn-outline-success" type="submit">{% trans 'Yes' %}</button>
+            <a class="btn btn-outline-danger" id="custom_logout_no" href="/home">{% trans 'No' %}</a>  </div>
 
-  {% endif %}
-  
-  <button  class="btn btn-outline-success" type="submit">{% trans 'Sign Out' %}</button>
-  <a class="btn btn-outline-danger" id="custom_logout_no" href="/home">{% trans 'No' %}</a>
-</form>
+        </form>
 
-</div>
+    </div>
+  </div>
 
 {% endblock %}

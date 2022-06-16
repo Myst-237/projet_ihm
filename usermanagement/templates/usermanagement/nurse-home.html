@@ -27,9 +27,9 @@
                         <div class="profile_info">
                             <div class="profile-image">
                             {% if user.profile_pic %}
-                            <img src="{{user.profile_pic.url}}" class="img-fluid" alt=""> 
+                            <img class="img-style-pp" src="{{user.profile_pic.url}}" class="img-fluid" alt=""> 
                             {% else %}    
-                                <img src="{% static 'usermanagement/images/random-avatar7.jpg' %}" class="img-fluid" alt="">                               
+                                <img class="img-style-pp" src="{% static 'usermanagement/images/default-pp.jpeg' %}" class="img-fluid" alt="">                               
                             {% endif %}  
                         </div>
                              <h4 class="mb-0"><strong> {{user.first_name}}</strong> {{user.last_name}}</h4>
@@ -49,10 +49,9 @@
                         <h2>About Me</h2>
                     </div>
                     <div class="body">
-                        <p class="text-default">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+                        <p class="text-default">{{user.about}}</p>
                         <blockquote>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
-                            <small>Designer <cite title="Source Title">Source Title</cite></small> </blockquote>
+                            <small> <cite title="Source Title">{{user.first_name}} {{user.last_name}}</cite></small> 
                     </div>
                 </div>
                 <div class="card">
@@ -93,9 +92,8 @@
                 <div class="card">
                     <div class="body"> 
                         <!-- Nav tabs -->
-                        <ul class="nav nav-tabs tab-nav-right" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#timeline">Activities</a></li>
-                        </ul>
+                        <h3 style="text-align:center"> Statistics</h3>
+
                         
                         <!-- Tab panes -->
                         <div class="tab-content">

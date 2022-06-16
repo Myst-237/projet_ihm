@@ -7,6 +7,8 @@ from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.core.exceptions import ObjectDoesNotExist
 from dateutil.relativedelta import relativedelta
+from django.urls import reverse
+
 
 #importing the user model from settings
 User = settings.AUTH_USER_MODEL
@@ -57,6 +59,7 @@ class CustomUser(AbstractUser):
     profession = models.CharField(max_length=100, blank = True, null = True)
     profile_pic = models.ImageField(blank = True, null = True)
     active_role = models.CharField(max_length=50, blank = True, null = True)
+    about = models.TextField(blank = True, null =True)
     
     
     def __str__(self):
@@ -83,6 +86,9 @@ class CustomUser(AbstractUser):
         self.date_of_birth = date_of_birth
         self.profession = profession
         self.save()
+        
+    def get_absolute_url(self):
+        return reverse('usermanagement:user-profile', kwargs={'pk':self.id})
     
  
  #patient model   
@@ -119,11 +125,13 @@ class Patient(models.Model):
             self.user.save()
         super(Patient, self).delete()
         
+    def get_absolute_url(self):
+        return reverse('usermanagement:list-patients')
+        
     
  #doctor model   
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE)
-    specialist = models.BooleanField(default=False)
     speciality =  models.CharField(max_length=100, default='NoSpeciality', choices = Speciality)
     
     def __str__(self):
@@ -142,6 +150,9 @@ class Doctor(models.Model):
             self.user.role.remove('Doctor')
             self.user.save()
         super(Doctor, self).delete()
+        
+    def get_absolute_url(self):
+        return reverse('usermanagement:list-doctors')
 
 
 #lab technician model
@@ -249,6 +260,9 @@ class Receptionist(models.Model):
             self.user.save()
         super(Receptionist, self).delete()
     
+    def get_absolute_url(self):
+        return reverse('usermanagement:list-receptionists')
+    
 
 #Nurse: taking vital signs, etc.
 class Nurse(models.Model):
@@ -270,6 +284,9 @@ class Nurse(models.Model):
     
     def __str__(self):
         return f"{self.user.username}"
+    
+    def get_absolute_url(self):
+        return reverse('usermanagement:list-nurses')
     
 #bill book
 class BillBook(models.Model):

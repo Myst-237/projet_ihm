@@ -2,7 +2,8 @@
 {% block title %} Doctor {% endblock %} 
 {% block dashbord %}  
                 <li><a href="{% url 'usermanagement:consultation_queue' 'Doctor' %}"><i class="zmdi zmdi-account-o"></i><span>Consultations</span> </a> </li>
-                <li><a href="{% url 'usermanagement:all_patients' role='Doctor' %}"><i class="zmdi zmdi-account-o"></i><span>All Patients</span> </a> </li>                                    
+                <li><a href="{% url 'usermanagement:all_patients' role='Doctor' %}"><i class="zmdi zmdi-account-o"></i><span>All Patients</span> </a> </li>                      
+              
 {% endblock %}
 {% block body %}
 

@@ -23,7 +23,8 @@ class CustomUserAdmin(UserAdmin):
                     'date_of_birth',
                     'profession', 
                     'profile_pic',
-                    'active_role'
+                    'active_role',
+                    'about'
                 )
             }
         )
